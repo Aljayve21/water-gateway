@@ -1,0 +1,40 @@
+# gateway.yaml — operational policy (no secrets; credentials/infra live in .env)
+#
+# Values marked [CONFIRMED] match the existing Enye EMS implementation
+# (ems-backend telemetry/notifications). Values marked [INFERRED] are
+# reasonable defaults pending owner confirmation.
+
+extraction:
+  # Master poll cycle. Mirrors the existing EMS notifications poller cadence.
+  poll_interval_seconds: 15          # [CONFIRMED: existing poller uses 15s]
+  batch_size: 500                     # max rows read per table per cycle
+  backoff:
+    initial_seconds: 1.0
+    max_seconds: 300.0
+    multiplier: 2.0
+
+buffer:
+  type: sqlite                        # persistent local buffer (Phase 3+)
+  path: ./buffer/gateway.db
+  retention_hours: 24                 # [INFERRED] retention window for retry/backlog
+  max_retries: 3
+
+staleness:
+  # Communication health bands — matches ems-backend deriveCommStatus().
+  online_hours: 24                    # [CONFIRMED] <= 24h since last contact = on-time
+  watch_hours: 48                     # [CONFIRMED] <= 48h = watch/delayed; beyond = lagging
+
+quality:
+  # Battery / signal thresholds — match the frontend Diagnostics module and
+  # the notifications service. NaN-style sentinel handling on the wire is
+  # [OWNER] (see blueprint K).
+  battery_critical_volts: 3.15        # [CONFIRMED]
+  battery_warning_volts: 3.35         # [CONFIRMED]
+  signal_critical_dbm: -100           # [CONFIRMED]
+  signal_warning_dbm: -90             # [CONFIRMED]
+
+logging:
+  level: INFO
+  dir: ./logs
+  max_bytes: 10485760                 # 10 MiB rotating file
+  backup_count: 5

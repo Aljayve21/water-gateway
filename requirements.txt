@@ -1,0 +1,20 @@
+# Pinned for Python >= 3.11. Install into a venv:
+#   python -m venv .venv
+#   .\.venv\Scripts\Activate.ps1
+#   pip install -r requirements.txt
+
+# Configuration
+pydantic>=2.7,<3
+pydantic-settings>=2.3,<3
+PyYAML>=6.0,<7
+
+# MySQL (read-only SELECT-only use)
+PyMySQL>=1.1,<2
+
+# Protocol servers (wired in later phases)
+pymodbus>=3.6,<4        # Modbus TCP server
+bacpypes3>=0.0.50        # BACnet/IP server
+
+# Testing
+pytest>=8.0,<9
+pytest-asyncio>=0.23,<1

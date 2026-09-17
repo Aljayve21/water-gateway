@@ -1,0 +1,27 @@
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Build/test artifacts
+.pytest_cache/
+.coverage
+dist/
+build/
+htmlcov/
+
+# Runtime artifacts
+logs/
+buffer/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.pid

@@ -1,0 +1,399 @@
+﻿# meters.yaml - per-meter protocol descriptors (Mapping Engine config).
+#
+# Auto-generated from live office DB. Register/coil addresses and BACnet
+# object instances remain [DRAFT placeholders] - the FINAL map must come
+# from the official BMS point list (blueprint S1/S2). Nothing here is
+# authoritative until the owner confirms the point list.
+#
+# To add a meter: copy any block, change the key + unit_id, list only
+# the points that meter exposes, and set final addresses.
+#
+# Decision log (owner-confirmed):
+#   - Modbus unit id: one unit id per meter        (S3)
+#   - BACnet: single gateway device, objects per meter (S4)
+meters:
+  "026026060001":
+    meter_id: "026026060001"
+    modbus_unit_id: 1                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 1 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 2 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 3 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 4 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 5 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 6 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 7 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 8 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 9 }  # [DRAFT pending BMS point list]
+  "026026060002":
+    meter_id: "026026060002"
+    modbus_unit_id: 2                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 10 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 11 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 12 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 13 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 14 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 15 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 16 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 17 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 18 }  # [DRAFT pending BMS point list]
+  "026026060003":
+    meter_id: "026026060003"
+    modbus_unit_id: 3                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 19 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 20 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 21 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 22 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 23 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 24 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 25 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 26 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 27 }  # [DRAFT pending BMS point list]
+  "026026060004":
+    meter_id: "026026060004"
+    modbus_unit_id: 4                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 28 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 29 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 30 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 31 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 32 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 33 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 34 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 35 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 36 }  # [DRAFT pending BMS point list]
+  "026026060005":
+    meter_id: "026026060005"
+    modbus_unit_id: 5                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 37 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 38 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 39 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 40 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 41 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 42 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 43 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 44 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 45 }  # [DRAFT pending BMS point list]
+  "026026060006":
+    meter_id: "026026060006"
+    modbus_unit_id: 6                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 46 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 47 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 48 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 49 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 50 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 51 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 52 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 53 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 54 }  # [DRAFT pending BMS point list]
+  "026026060007":
+    meter_id: "026026060007"
+    modbus_unit_id: 7                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 55 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 56 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 57 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 58 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 59 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 60 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 61 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 62 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 63 }  # [DRAFT pending BMS point list]
+  "026026060008":
+    meter_id: "026026060008"
+    modbus_unit_id: 8                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 64 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 65 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 66 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 67 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 68 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 69 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 70 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 71 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 72 }  # [DRAFT pending BMS point list]
+  "026026060009":
+    meter_id: "026026060009"
+    modbus_unit_id: 9                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 73 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 74 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 75 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 76 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 77 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 78 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 79 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 80 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 81 }  # [DRAFT pending BMS point list]
+  "057A26060001":
+    meter_id: "057A26060001"
+    modbus_unit_id: 10                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 82 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 83 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 84 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 85 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 86 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 87 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 88 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 89 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 90 }  # [DRAFT pending BMS point list]
+  "057A26060002":
+    meter_id: "057A26060002"
+    modbus_unit_id: 11                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 91 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 92 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 93 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 94 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 95 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 96 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 97 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 98 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 99 }  # [DRAFT pending BMS point list]
+  "057A26060003":
+    meter_id: "057A26060003"
+    modbus_unit_id: 12                 # auto [DRAFT pending BMS point list]
+    bacnet_device: 1                   # single gateway BACnet device
+    points:
+      totalizer:
+        modbus: { register_type: holding, address: 40001, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 100 }  # [DRAFT pending BMS point list]
+      pressure:
+        modbus: { register_type: holding, address: 40003, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 101 }  # [DRAFT pending BMS point list]
+      reverse:
+        modbus: { register_type: holding, address: 40005, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 102 }  # [DRAFT pending BMS point list]
+      pulse1:
+        modbus: { register_type: holding, address: 40007, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 103 }  # [DRAFT pending BMS point list]
+      pulse2:
+        modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 104 }  # [DRAFT pending BMS point list]
+      battery:
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 105 }  # [DRAFT pending BMS point list]
+      signal:
+        modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: AI, instance: 106 }  # [DRAFT pending BMS point list]
+      online:
+        modbus: { register_type: coil, address: 1, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 107 }  # [DRAFT pending BMS point list]
+      alarm:
+        modbus: { register_type: coil, address: 2, dtype: bool, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        bacnet: { object: BI, instance: 108 }  # [DRAFT pending BMS point list]
+

@@ -1,0 +1,87 @@
+# base_points.yaml — canonical point vocabulary for the gateway.
+#
+# Each entry defines the neutral "point id" the normalizer emits and the
+# office mdpf source column it is derived from. This vocabulary is
+# protocol-independent: Mapping Engine projects each point to both Modbus
+# and BACnet (config/meters.yaml) without duplicating business logic.
+#
+# Sources verified against ems-backend (prisma/schema.prisma + telemetry.service.ts).
+#
+#   confirmed: true   = verified against schema + existing EMS channel vocabulary
+#   confirmed: false  = [DRAFT] semantics pending owner/BMS confirmation
+
+points:
+  totalizer:
+    source_table: analyze_result
+    source_column: amount
+    unit: m3
+    kind: analog                    # [CONFIRMED] Totalizer channel (amount, m³)
+    description: Cumulative totalizer consumption, cubic meters.
+    confirmed: true
+
+  pressure:
+    source_table: analyze_result
+    source_column: pressure
+    unit: kg/cm2
+    kind: analog                    # [CONFIRMED] Pressure channel (pressure, Kg/cm²)
+    description: Line pressure, kilograms per square centimeter.
+    confirmed: true
+
+  reverse:
+    source_table: analyze_result
+    source_column: r_amount
+    unit: m3
+    kind: analog                    # [CONFIRMED] Reverse Flow channel (r_amount, m³)
+    description: Reverse-flow totalizer, cubic meters.
+    confirmed: true
+
+  pulse1:
+    source_table: analyze_result
+    source_column: sensor1_f
+    unit: L
+    kind: analog                    # [CONFIRMED] Pulse1 channel (sensor1_f, L)
+    description: Pulse counter 1 (forward), liters.
+    confirmed: true
+
+  pulse2:
+    source_table: analyze_result
+    source_column: sensor2_f
+    unit: L
+    kind: analog                    # [CONFIRMED] Pulse2 channel (sensor2_f, L)
+    description: Pulse counter 2 (forward), liters.
+    confirmed: true
+
+  battery:
+    source_table: analyze_head
+    source_column: bat
+    unit: V
+    kind: analog                    # [CONFIRMED] analy_head.bat (Decimal volts)
+    description: Device battery voltage, volts (decimal stored; scale to wire per mapping).
+    confirmed: true
+
+  signal:
+    source_table: analyze_head
+    source_column: rsrp
+    fallback_column: rssi
+    unit: dBm
+    kind: analog
+    description: >-
+      Signal strength, dBm. Prefer rsrp when valid (negative); otherwise rssi.
+      Matches telemetry.service.ts rsrp -> rssi preference. [CONFIRMED]
+    confirmed: true
+
+  online:
+    unit: binary
+    kind: binary
+    description: >-
+      Derived device reachability from last contact age vs staleness bands
+      (<=24h online, <=48h delayed, else offline). [CONFIRMED rule]
+    confirmed: true
+
+  alarm:
+    unit: binary
+    kind: binary
+    description: >-
+      Aggregate "an alarm is active for this meter". Source/semantics pending
+      owner rule (analy_result.alarm / analy_file.alarm / minin_water_guard_alarm).
+    confirmed: false                 # [DRAFT] which codes are actionable is [OWNER]
