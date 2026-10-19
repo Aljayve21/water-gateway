@@ -17,10 +17,10 @@ Two directions are supported, because both are needed:
              used by ``GET /bms/points/{equipment}/{point}`` so a caller can
              address a point by name.
 
-Forward lookups are authoritative and cheap (dict). The reverse index is built
-once from the forward map plus, when a store is supplied, the station's own
-device/point names - so unmapped points are addressable by their station names
-too, which is what makes the path form useful on day one.
+Both directions are deliberately the *same* function, so an address the server
+hands out always resolves back to the point it came from. Lookups are
+case-insensitive and the catalog is small (a station has hundreds of points, not
+millions), so a linear scan keeps the code simple and correct.
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ class EquipmentMap:
         for key, value in (raw.get("points") or {}).items():
             meter_id, _, point_id = str(key).partition("/")
             if meter_id and point_id and value:
-                points[(_norm(meter_id), _norm(point_id))] = str(value)
+                points[(meter_id, point_id)] = str(value)
         return cls(devices=devices, points=points)
 
     @classmethod
@@ -95,28 +95,46 @@ class EquipmentMap:
             meter_id = row.get("meter_id")
             name = row.get("name")
             if meter_id and name:
-                self.station_devices[str(meter_id)] = str(name)
+                self.station_devices.setdefault(str(meter_id), str(name))
         for row in points or []:
             meter_id = row.get("meter_id")
             point_id = row.get("point_id")
             name = row.get("name")
             if meter_id and point_id and name:
-                self.station_points[(_norm(meter_id), _norm(point_id))] = str(name)
+                self.station_points.setdefault(
+                    (str(meter_id), str(point_id)), str(name)
+                )
         return self
+
+    def add_station_point(self, meter_id: str, point_id: str, name: str = "") -> None:
+        """Record one point's station name without a full catalog read."""
+        if meter_id and point_id:
+            self.station_points.setdefault(
+                (meter_id, point_id), name or point_id
+            )
 
     # ── forward lookups ────────────────────────────────────────────────
     def equipment_id(self, meter_id: str) -> str:
         """Friendly id for a device: mapped name, else station name, else id."""
-        if meter_id in self.devices:
-            return self.devices[meter_id]
-        return self.station_devices.get(meter_id) or meter_id
+        wanted = _norm(meter_id)
+        for mid, equipment in self.devices.items():
+            if _norm(mid) == wanted:
+                return equipment
+        for mid, name in self.station_devices.items():
+            if _norm(mid) == wanted:
+                return name
+        return meter_id
 
     def equipment_point(self, meter_id: str, point_id: str) -> str:
         """Friendly name for a point: mapped, else station name, else id."""
-        key = (_norm(meter_id), _norm(point_id))
-        if key in self.points:
-            return self.points[key]
-        return self.station_points.get(key) or point_id
+        wanted_meter, wanted_point = _norm(meter_id), _norm(point_id)
+        for (mid, pid), name in self.points.items():
+            if _norm(mid) == wanted_meter and _norm(pid) == wanted_point:
+                return name
+        for (mid, pid), name in self.station_points.items():
+            if _norm(mid) == wanted_meter and _norm(pid) == wanted_point:
+                return name
+        return point_id
 
     def resolve(self, meter_id: str, point_id: str) -> dict[str, str]:
         """Both names for a point, as exposed on the read API."""
@@ -126,73 +144,47 @@ class EquipmentMap:
         }
 
     # ── reverse lookup ─────────────────────────────────────────────────
+    def _meters_named(self, equipment_id: str) -> list[str]:
+        """Every station meter_id that answers to this equipment id."""
+        wanted = _norm(equipment_id)
+        found: list[str] = []
+        for mid, equipment in self.devices.items():
+            if _norm(equipment) == wanted and mid not in found:
+                found.append(mid)
+        for mid, name in self.station_devices.items():
+            if _norm(name) == wanted and mid not in found:
+                found.append(mid)
+        # The equipment id may simply be the raw meter_id.
+        if equipment_id and equipment_id not in found:
+            found.append(equipment_id)
+        return found
+
     def to_station(
         self, equipment_id: str, equipment_point: str
     ) -> Optional[tuple[str, str]]:
         """Resolve an equipment address back to (meter_id, point_id).
 
-        Mapped entries win. When no mapping matches, station names are tried,
-        so ``GET /bms/points/ENYECONTROLS/MEZZ_TR_Temp$20Reading``-style
-        addresses still resolve. Returns None when nothing matches.
+        Uses the same names the forward direction hands out, so any address
+        returned by :meth:`resolve` round-trips. Returns None when nothing
+        matches.
         """
-        want_eq = _norm(equipment_id)
-        want_pt = _norm(equipment_point)
-
-        # 1. Explicit mapping: equipment_id -> meter_id.
-        meter_id = next(
-            (mid for mid, eq in self.devices.items() if _norm(eq) == want_eq),
-            None,
-        )
-        if meter_id is not None:
-            point_id = next(
-                (
-                    pid
-                    for (mid, pid), name in self.points.items()
-                    if mid == _norm(meter_id) and _norm(name) == want_pt
-                ),
-                None,
-            )
-            if point_id is not None:
-                return meter_id, point_id
-
-        # 2. Station names: equipment_id is the device's station name.
-        meter_id = next(
-            (mid for mid, name in self.station_devices.items() if _norm(name) == want_eq),
-            None,
-        )
-        if meter_id is not None:
-            point_id = next(
-                (
-                    pid
-                    for (mid, pid), name in self.station_points.items()
-                    if mid == _norm(meter_id) and _norm(name) == want_pt
-                ),
-                None,
-            )
-            if point_id is not None:
-                return meter_id, point_id
-
-        # 3. Last resort: the equipment id is itself a meter_id.
-        for mid in {self.devices.get(equipment_id, ""), equipment_id}:
-            if not mid:
-                continue
-            point_id = next(
-                (
-                    pid
-                    for (m, pid), name in self.points.items()
-                    if m == _norm(mid) and _norm(name) == want_pt
-                ),
-                None,
-            )
-            if point_id is not None:
-                return mid, point_id
+        for meter_id in self._meters_named(equipment_id):
+            for (mid, pid) in list(self.points) + list(self.station_points):
+                if _norm(mid) != _norm(meter_id):
+                    continue
+                if _norm(self.equipment_point(mid, pid)) == _norm(equipment_point):
+                    return mid, pid
         return None
 
     def is_mapped(self, meter_id: str, point_id: str) -> bool:
         """True when this device/point has an explicit entry in the map."""
-        return meter_id in self.devices or (
-            _norm(meter_id), _norm(point_id)
-        ) in self.points
+        wanted_meter, wanted_point = _norm(meter_id), _norm(point_id)
+        if any(_norm(mid) == wanted_meter for mid in self.devices):
+            return True
+        return any(
+            _norm(mid) == wanted_meter and _norm(pid) == wanted_point
+            for (mid, pid) in self.points
+        )
 
     def summary(self) -> dict:
         """Shape summary for /bms/equipment and status output."""

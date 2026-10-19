@@ -751,10 +751,9 @@ class AIServer:
         row["writable"] = self._is_writable(meter_id, point_id)
         self._hydrate_equipment_map()
         # A point's own station name is the best fallback for the equipment
-        # point, so pass it through rather than re-reading the catalog.
-        self.equipment_map.station_points.setdefault(
-            (meter_id.casefold(), point_id.casefold()),
-            str(row.get("name") or point_id),
+        # point, so record it here rather than relying only on the catalog read.
+        self.equipment_map.add_station_point(
+            meter_id, point_id, str(row.get("name") or point_id)
         )
         row.update(self.equipment_map.resolve(meter_id, point_id))
         return row

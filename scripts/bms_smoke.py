@@ -86,16 +86,39 @@ def main() -> int:
     print(f"target {base}  auth {description}")
     failures = 0
 
-    for path in ("/bms/points", "/bms/devices", "/bms/alarms", "/bms/status"):
+    def _get(path: str) -> dict:
         code, body = _call(base, token, path)
         count = body.get("count") if isinstance(body, dict) else None
-        print(f"  GET {path:<16} {code}  count={count}")
+        print(f"  GET {path:<20} {code}  count={count}")
+        nonlocal failures
         failures += code != 200
+        return body if isinstance(body, dict) else {}
 
-    code, body = _call(base, token, "/bms/points")
-    meters = body.get("meters", []) if isinstance(body, dict) else []
-    total = body.get("total") if isinstance(body, dict) else None
+    # Kept to at most 10 requests: the server rate-limits each client to ten a
+    # minute, and a smoke test should not trip the limit it is testing.
+    points_body = _get("/bms/points")
+    _get("/bms/devices")
+    _get("/bms/alarms")
+    _get("/bms/status")
+    equipment_body = _get("/bms/equipment")
+
+    meters = points_body.get("meters", [])
+    total = points_body.get("total")
     print(f"  meters: {meters}  total points: {total}")
+
+    # Equipment naming: /bms/equipment hands out both names per point, and the
+    # equipment address it hands out must resolve back to the same point.
+    rows = equipment_body.get("equipment", [])
+    if rows:
+        sample = rows[0]
+        eq_id = sample.get("equipment_id")
+        eq_pt = sample.get("equipment_point")
+        print(f"  equipment names: {eq_id} / {eq_pt}")
+        failures += not (eq_id and eq_pt)
+        code, detail = _call(base, token, f"/bms/points/{eq_id}/{eq_pt}")
+        same = code == 200 and detail.get("point_id") == sample.get("point_id")
+        print(f"  GET /bms/points/{{eq}}/{{pt}}  {code}  resolves={same}")
+        failures += not same
 
     # Pagination: a limit=1 page must return one row but still report the total.
     code, page = _call(base, token, "/bms/points?limit=1&offset=0")
@@ -119,10 +142,6 @@ def main() -> int:
             )
             print(f"  GET /bms/history  {code}  count={body.get('count')}")
             failures += code != 200
-
-    code, body = _call(base, token, "/bms/history")
-    print(f"  GET /bms/history (no params)  {code}  {body.get('error')}")
-    failures += code != 400
 
     print("OK" if not failures else f"{failures} check(s) failed")
     return 1 if failures else 0

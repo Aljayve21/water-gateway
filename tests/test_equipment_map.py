@@ -140,6 +140,31 @@ class TestReverseLookup:
         )
         assert emap.to_station("bms_x", "SpaceTemp") == ("bms_x", "temp")
 
+    def test_every_forward_name_round_trips(self):
+        # What resolve() hands out must always resolve back, for mapped and
+        # unmapped points alike. This is the property the API depends on.
+        emap = EquipmentMap.from_dict({"devices": {"bms_x": "AHU-01"}})
+        emap.with_station_names(
+            devices=[{"meter_id": "bms_x", "name": "AHU-01"}],
+            points=[
+                {"meter_id": "bms_x", "point_id": "temp", "name": "SpaceTemp"},
+                # A station whose "name" is just the point id - the live case.
+                {"meter_id": "bms_x", "point_id": "flow", "name": "flow"},
+            ],
+        )
+        for point_id in ("temp", "flow"):
+            names = emap.resolve("bms_x", point_id)
+            assert emap.to_station(
+                names["equipment_id"], names["equipment_point"]
+            ) == ("bms_x", point_id)
+
+    def test_add_station_point_round_trips_without_full_catalog(self):
+        emap = EquipmentMap.from_dict({"devices": {"bms_x": "AHU-01"}})
+        emap.add_station_point("bms_x", "flow", "flow")
+        names = emap.resolve("bms_x", "flow")
+        assert names == {"equipment_id": "AHU-01", "equipment_point": "flow"}
+        assert emap.to_station("AHU-01", "flow") == ("bms_x", "flow")
+
 
 class TestSummary:
     def test_summary_counts_both_layers(self):
