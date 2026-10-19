@@ -14,8 +14,8 @@ extraction:
     multiplier: 2.0
 
 buffer:
-  type: sqlite                        # persistent local buffer (Phase 3+)
-  path: ./buffer/gateway.db
+  type: mysql                        # local MySQL buffer (gateway_buffer DB)
+  path: ./buffer/gateway.db          # legacy field, ignored by the MySQL buffer
   retention_hours: 24                 # [INFERRED] retention window for retry/backlog
   max_retries: 3
 

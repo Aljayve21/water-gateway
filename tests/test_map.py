@@ -220,6 +220,10 @@ def test_modbus_int_applies_scale(real_engine):
     out = decode_float32(words, point.byte_order, point.word_order)
     assert out == 10.0
     battery = real_engine.map.meters[FIRST_METER].points["battery"].modbus
-    words = real_engine.modbus_int(battery, 3.63)  # scale 0.001 [DRAFT]
+    # Battery is published in volts (scale 1.0) so the Modbus wire value matches
+    # the BACnet one, whose engineering unit is "volts". A scale of 0.001 here
+    # would encode 3.63 V as 0.00363, which no BMS can interpret.
+    words = real_engine.modbus_int(battery, 3.63)
     out = decode_float32(words, battery.byte_order, battery.word_order)
-    assert out == pytest.approx(0.00363)
+    assert out == pytest.approx(3.63)
+    assert battery.scale == pytest.approx(1.0)

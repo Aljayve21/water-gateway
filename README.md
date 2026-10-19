@@ -7,6 +7,13 @@ database and exposes normalized water-meter data over **Modbus TCP** and
 > **Office MySQL `mdpf` is the source of truth. This gateway is READ-ONLY
 > toward the office database — it never executes INSERT / UPDATE / DELETE /
 > ALTER / DROP, never changes users, permissions, or schema.**
+>
+> All gateway state (staged events, snapshots, normalized values, hourly
+> history, AI findings/summaries) lives in a **local MySQL buffer database**
+> (`gateway_buffer`) with its own least-privilege account — a separate
+> database from both the office `mdpf` and the ems-backend schema, so no
+> migrations can collide. Configure it with the `BUFFER_MYSQL_*` variables
+> in `.env` (see `.env.example`).
 
 It does **not** replace the existing office receiver, does not modify meter/logger
 configuration, and does not touch any existing production service.
@@ -59,6 +66,21 @@ python -m gateway.main        # from src\
 ```powershell
 pytest
 ```
+
+## BMS / oBIX (read-only)
+
+The gateway also mirrors the Neoview BMS over oBIX into a separate `obix`
+database and validates it. All of these are read-only:
+
+```powershell
+python scripts\probe_facets.py      # read Neoview min/max/unit/precision facets -> config\obix_facets.json
+python scripts\validate_obix.py     # run validation rules against the obix DB (--json / --meter / --no-facets)
+python scripts\bms_smoke.py         # hit the /bms/* HTTP endpoints
+```
+
+`config\obix_requirements.yaml` is the authored source of truth; when the station
+is reachable its own facets (read by the probe) are preferred, then the cache,
+then this file. Point-level `points:` entries always win.
 
 ## Read-only contract
 

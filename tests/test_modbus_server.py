@@ -134,9 +134,10 @@ def test_read_battery_applies_scale(seeded_engine):
     async def case():
         server, port = await _run_server(engine, live)
         try:
-            # 40011 -> pdu 10 (battery, scale 0.001 -> 3.63 V encodes 0.00363)
+            # 40011 -> pdu 10 (battery, published in volts so the Modbus value
+            # matches the BACnet one; a 0.001 scale would read as 0.00363 V)
             _, pdu = await _request(port, 1, 0x03, struct.pack(">HH", 10, 2))
-            assert _real_registers(pdu) == pytest.approx(0.00363)
+            assert _real_registers(pdu) == pytest.approx(3.63)
         finally:
             await server.stop()
 

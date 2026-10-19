@@ -1,0 +1,112 @@
+# obix_requirements.yaml - what each Neoview point is *supposed* to look like.
+#
+# The validator (src/gateway/obix_validation.py) compares the live oBIX value
+# against the requirements here and emits findings. It is deterministic, like
+# ai/anomaly.py - the operator owns these numbers, the AI only explains them.
+#
+# Resolution order for a point (later wins):
+#   1. `defaults`                         (applies to every point)
+#   2. `unit_bounds[<unit>]`              (generic sanity bounds for its unit)
+#   3. live Neoview `facets`              (when the station is reachable - see
+#                                          the `facets:` section below and
+#                                          scripts/probe_facets.py)
+#   4. `points["<meter_id>/<point_id>"]`  (explicit per-point override)
+#
+# NOTE: Neoview facets (min/max/precision) are read live over oBIX when the
+# station is reachable (src/gateway/obix_facets.py + scripts/probe_facets.py)
+# and are preferred over `unit_bounds`. This file stays the fallback and the
+# place for explicit per-point overrides.
+
+defaults:
+  # A reading older than this is `stale`. Zero/absent disables the check.
+  max_age_seconds: 900
+  # Per-rule severity. Merged with any per-point `severity:` override.
+  severity:
+    no_value: critical
+    unit_mismatch: warning
+    out_of_range: critical
+    enum_invalid: warning
+    stale: warning
+    frozen: info
+
+# Opt-in: flag a point whose value has not changed for N hourly buckets.
+# Off by default because a quiet/zeroed sensor will otherwise flood findings.
+frozen:
+  enabled: false
+  buckets: 6
+
+# Generic sanity bounds per unit. Applied to any point reporting that unit,
+# so the common case needs no per-point entry. Units are the oBIX strings the
+# station reports (the `obix:units/` prefix is optional).
+unit_bounds:
+  "obix:units/celsius":
+    min: -20
+    max: 80
+  "obix:units/percent":
+    min: 0
+    max: 100
+  "obix:units/parts per million":
+    min: 0
+    max: 5000
+  "obix:units/micrograms per cubic meter":
+    min: 0
+    max: 1000
+  "obix:units/ampere":
+    min: 0
+    max: 100
+  "obix:units/volt":
+    min: 0
+    max: 500
+  "obix:units/hertz":
+    min: 45
+    max: 65
+  "obix:units/kilowatt":
+    min: 0
+    max: 10000
+  "obix:units/kilowatt hour":
+    min: 0
+    max: 10000000
+  # NOTE(controls): live BTU points read ~1e6-7e6 in this unit, which looks
+  # mis-scaled for "kilobtus per hour"; bound is left permissive until the
+  # correct scale is confirmed.
+  "obix:units/kilobtus per hour":
+    min: 0
+    max: 100000000
+  "obix:units/cubic meter":
+    min: 0
+    max: 10000000
+
+# Live Neoview facets - read from the station over oBIX (see
+# src/gateway/obix_facets.py and scripts/probe_facets.py). When the station is
+# reachable, its own point config replaces the generic `unit_bounds` guesses
+# above; an explicit `points` entry below still wins, so a single point can
+# always be tightened by hand. When the station is unreachable the last cached
+# facets are reused, and with no cache the file above drives everything.
+facets:
+  enabled: true           # false = ignore the facet cache entirely
+  cache: "obix_facets.json"  # relative paths resolve under config/
+  trust_unit: true        # a facet unit sets the required unit
+  use_precision: true     # treat facet precision as an out-of-range tolerance
+
+# Explicit per-point requirements (tighten/enable checks for key points).
+points:
+  "bms_enyecontrols/b_2f_co2_reading_ai34":
+    unit: "obix:units/parts per million"
+    min: 0
+    max: 2000
+  "bms_enyecontrols/b_3f_co2_reading_ai38":
+    unit: "obix:units/parts per million"
+    min: 0
+    max: 2000
+  "bms_enyecontrols/b_gf_co2_reading_ai26":
+    unit: "obix:units/parts per million"
+    min: 0
+    max: 2000
+  "bms_enyecontrols/b_3f_temp_reading_ai37":
+    unit: "obix:units/celsius"
+    min: 15
+    max: 35
+  "bms_enyecontrols/b_2f_rh_reading_ai52":
+    unit: "obix:units/percent"
+    min: 20
+    max: 80

@@ -1,4 +1,4 @@
-"""SQLite buffer behavior tests (offline, temp database)."""
+"""MySQL buffer behavior tests (against the local test database)."""
 
 from __future__ import annotations
 
@@ -22,9 +22,15 @@ def buffer(tmp_path):
     b.close()
 
 
-def test_wal_mode(buffer):
-    row = buffer._conn.execute("PRAGMA journal_mode").fetchone()
-    assert str(row[0]).lower() == "wal"
+def test_tables_use_innodb(buffer):
+    """Durability needs a transactional engine, not MyISAM/HEAP."""
+    with buffer._conn.cursor() as cur:
+        cur.execute(
+            "SELECT ENGINE FROM information_schema.TABLES"
+            " WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'stage_events'"
+        )
+        row = cur.fetchone()
+    assert row["ENGINE"].lower() == "innodb"
 
 
 def test_initialize_is_idempotent(buffer):
@@ -53,9 +59,11 @@ def test_state_transition_and_attempts(buffer):
     buffer.stage_event("t", "k", {"v": 1})
     buffer.mark_staged("k")
     buffer.mark_consumed("k")
-    row = buffer._conn.execute(
-        "SELECT state, attempts FROM stage_events WHERE source_key = 'k'"
-    ).fetchone()
+    with buffer._conn.cursor() as cur:
+        cur.execute(
+            "SELECT state, attempts FROM stage_events WHERE source_key = 'k'"
+        )
+        row = cur.fetchone()
     assert row["state"] == STATE_CONSUMED
     assert row["attempts"] == 2
 

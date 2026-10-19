@@ -15,10 +15,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from typing import Optional
 
-from bacpypes3.local.analog import AnalogInputObject
-from bacpypes3.local.binary import BinaryInputObject
-from bacpypes3.object import DeviceObject
+from bacpypes3.local.analog import AnalogInputObject, AnalogValueObject
+from bacpypes3.local.binary import BinaryInputObject, BinaryValueObject
+# The local.device subclass supplies the required I-Am defaults
+# (maxApduLengthAccepted, segmentationSupported, protocolVersion, ...).
+# The abstract bacpypes3.object.DeviceObject lacks them, so I-Am responses
+# fail to encode and the device can never be discovered.
+from bacpypes3.local.device import DeviceObject
 from bacpypes3.pdu import Address
 from bacpypes3.primitivedata import Boolean, Real
 
@@ -33,15 +38,25 @@ class BACnetServer:
     """BACnet/IP server backed by a compiled :class:`MappingEngine`."""
 
     def __init__(
-        self, host: str, port: int, device_instance: int, engine: MappingEngine
+        self,
+        host: str,
+        port: int,
+        device_instance: int,
+        engine: MappingEngine,
+        findings_objects: Optional[list] = None,
     ) -> None:
         self.host = host
         self.port = port
         self.device_instance = device_instance
         self.engine = engine
         self.map: CompiledMap = engine.map
+        # Findings objects are derived state, not measurements: they are created
+        # separately (config/findings.yaml) because they must be AV/BV, which
+        # are writable types, while measurements stay read-only AI/BI.
+        self._findings_objects = list(findings_objects or [])
 
         self.objects: dict[str, AnalogInputObject | BinaryInputObject] = {}
+        self.finding_objects: dict[str, object] = {}
         self._app = None
         self._device = None
         self._started = False
@@ -78,9 +93,32 @@ class BACnetServer:
                 )
             self.objects[key] = obj
 
+        for spec in self._findings_objects:
+            oid = (point_id_type(spec.object_type), spec.instance)
+            if spec.object_type == "BV":
+                obj = BinaryValueObject(
+                    objectIdentifier=oid,
+                    objectName=spec.object_name,
+                    description=spec.label,
+                    presentValue=Boolean(False),
+                    statusFlags=[False, False, False, False],
+                )
+            else:
+                obj = AnalogValueObject(
+                    objectIdentifier=oid,
+                    objectName=spec.object_name,
+                    description=spec.label,
+                    presentValue=Real(0.0),
+                    statusFlags=[False, False, False, False],
+                    covIncrement=1.0,
+                )
+            self.finding_objects[f"{spec.meter_id}|{spec.key}"] = obj
+
         self._app = _NormalApplication(
             self._device, Address((self.host, self.port))
         )
+        for obj in self.finding_objects.values():
+            self._app.add_object(obj)
         for obj in self.objects.values():
             self._app.add_object(obj)
         self._started = True
@@ -108,6 +146,30 @@ class BACnetServer:
                 else:
                     new_value = Real(float(value))
                 loop.create_task(obj.write_property("presentValue", new_value))
+
+    def sync_findings(self, state: dict[str, dict]) -> int:
+        """Write AI findings into the AV/BV objects. Returns objects updated.
+
+        ``state`` comes from :func:`gateway.findings.meter_state`. Meters with
+        no open findings still get their flags cleared, so a resolved finding
+        actually clears at the BMS instead of latching on forever.
+        """
+        if not self._started or not self.finding_objects:
+            return 0
+        loop = asyncio.get_running_loop()
+        updated = 0
+        for meter_id, values in state.items():
+            for key, value in values.items():
+                obj = self.finding_objects.get(f"{meter_id}|ai:{key}")
+                if obj is None:
+                    continue
+                if isinstance(obj, BinaryValueObject):
+                    new_value = Boolean(bool(value))
+                else:
+                    new_value = Real(float(value))
+                loop.create_task(obj.write_property("presentValue", new_value))
+                updated += 1
+        return updated
 
     async def stop(self) -> None:
         if self._app is not None:

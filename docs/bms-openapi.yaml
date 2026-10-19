@@ -1,0 +1,382 @@
+openapi: 3.1.0
+info:
+  title: Enye BMS Gateway API
+  version: 1.0.0
+  description: |
+    Read-only JSON API in front of the on-prem water-gateway. Neoview/BMS oBIX
+    points are polled by the gateway and persisted to a dedicated MySQL database;
+    these endpoints expose the catalog, latest values, hourly history, devices
+    and alarms.
+
+    This document is the interface contract for two consumers:
+      * the AWS Bedrock Agent action group (imported as the tool schema), and
+      * the Amazon API Gateway / Lambda layer that fronts it.
+
+    Authentication is a bearer token per caller. The caller's role (ADMIN,
+    TECHNICIAN, USER) and meter allow-list are enforced server-side; a USER only
+    ever sees their own meters.
+
+    Notes:
+      * All timestamps are ISO-8601 UTC strings.
+      * List endpoints are paginated. `limit` defaults to 200 and is capped at
+        1000; `limit=0` means "no cap" (intended for in-process callers).
+      * A point value is returned both numerically (`value`) and as text
+        (`text_value`, e.g. "true"/"false" for booleans). Either may be null.
+servers:
+  - url: http://127.0.0.1:9091
+    description: Local gateway (development)
+  - url: https://ems.enye.com.ph
+    description: Office reverse proxy (production)
+security:
+  - bearerAuth: []
+tags:
+  - name: bms
+    description: Read-only Neoview/BMS endpoints.
+
+paths:
+  /bms/points:
+    get:
+      tags: [bms]
+      summary: List the latest value of every visible BMS point.
+      parameters:
+        - $ref: "#/components/parameters/MeterIdQuery"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: A page of points.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointsPage"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /bms/points/{meter_id}:
+    get:
+      tags: [bms]
+      summary: List the catalog and latest value of the points on one device.
+      parameters:
+        - $ref: "#/components/parameters/MeterId"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Points for the device.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DevicePointsPage"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /bms/points/{meter_id}/{point_id}:
+    get:
+      tags: [bms]
+      summary: Get one point's catalog metadata and latest value.
+      parameters:
+        - $ref: "#/components/parameters/MeterId"
+        - $ref: "#/components/parameters/PointId"
+      responses:
+        "200":
+          description: The point.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointDetail"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /bms/devices:
+    get:
+      tags: [bms]
+      summary: List the BMS devices (pseudo-meters) that have been scanned.
+      responses:
+        "200":
+          description: Device catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items: { $ref: "#/components/schemas/Device" }
+                  count: { type: integer }
+                required: [devices, count]
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /bms/status:
+    get:
+      tags: [bms]
+      summary: Data freshness - last read pass and row counts (operator only).
+      responses:
+        "200":
+          description: Freshness snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /bms/alarms:
+    get:
+      tags: [bms]
+      summary: List open alarms visible to the caller.
+      description: |
+        Two sources feed one list, sorted by severity (worst first):
+
+        * water-meter anomaly findings recorded by the gateway (no `source`
+          field), and
+        * BMS/Neoview points that violate their configured requirements
+          (`source: obix_validation`), from `config/obix_requirements.yaml`.
+
+        Requirement findings carry `rule` (e.g. `out_of_range`, `stale`,
+        `unit_mismatch`) plus the offending `value`/`text_value`/`unit`.
+      responses:
+        "200":
+          description: Open alarms.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  alarms:
+                    type: array
+                    items: { $ref: "#/components/schemas/Alarm" }
+                  count: { type: integer }
+                required: [alarms, count]
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /bms/history:
+    get:
+      tags: [bms]
+      summary: Hourly history rollup for one point.
+      parameters:
+        - $ref: "#/components/parameters/MeterIdQueryRequired"
+        - $ref: "#/components/parameters/PointIdQueryRequired"
+        - name: since
+          in: query
+          required: false
+          description: Earliest UTC hour bucket, inclusive.
+          schema: { type: string, format: date-time }
+        - name: until
+          in: query
+          required: false
+          description: Latest UTC hour bucket, inclusive.
+          schema: { type: string, format: date-time }
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: History buckets, oldest first.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Per-caller token resolved to a role and meter allow-list.
+
+  parameters:
+    MeterId:
+      name: meter_id
+      in: path
+      required: true
+      schema: { type: string }
+    PointId:
+      name: point_id
+      in: path
+      required: true
+      schema: { type: string }
+    MeterIdQuery:
+      name: meter_id
+      in: query
+      required: false
+      description: Restrict to one device.
+      schema: { type: string }
+    MeterIdQueryRequired:
+      name: meter_id
+      in: query
+      required: true
+      schema: { type: string }
+    PointIdQueryRequired:
+      name: point_id
+      in: query
+      required: true
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Page size (default 200, max 1000; 0 = no cap).
+      schema: { type: integer, minimum: 0, maximum: 1000, default: 200 }
+    Offset:
+      name: offset
+      in: query
+      required: false
+      description: Rows to skip.
+      schema: { type: integer, minimum: 0, default: 0 }
+
+  schemas:
+    PointValue:
+      type: object
+      properties:
+        meter_id: { type: string }
+        point_id: { type: string }
+        name: { type: string }
+        value: { type: [number, "null"] }
+        text_value: { type: [string, "null"] }
+        unit: { type: string }
+        status: { type: string, example: ok }
+        captured_utc: { type: [string, "null"], format: date-time }
+      required: [meter_id, point_id]
+    PointDetail:
+      allOf:
+        - $ref: "#/components/schemas/PointValue"
+        - type: object
+          properties:
+            href: { type: string }
+            is_type: { type: string }
+    PointsPage:
+      type: object
+      properties:
+        meters:
+          type: array
+          items: { type: string }
+        points:
+          type: array
+          items: { $ref: "#/components/schemas/PointValue" }
+        count: { type: integer, description: Rows in this page. }
+        total: { type: integer, description: Rows matching the filter. }
+        limit: { type: [integer, "null"] }
+        offset: { type: integer }
+      required: [meters, points, count, total]
+    DevicePointsPage:
+      type: object
+      properties:
+        meter_id: { type: string }
+        points:
+          type: array
+          items: { $ref: "#/components/schemas/PointValue" }
+        count: { type: integer }
+        total: { type: integer }
+        limit: { type: [integer, "null"] }
+        offset: { type: integer }
+      required: [meter_id, points, count, total]
+    HistoryBucket:
+      type: object
+      properties:
+        bucket_utc: { type: string, format: date-time }
+        avg_value: { type: [number, "null"] }
+        min_value: { type: [number, "null"] }
+        max_value: { type: [number, "null"] }
+        last_value: { type: [number, "null"] }
+        samples: { type: integer }
+      required: [bucket_utc]
+    HistoryPage:
+      type: object
+      properties:
+        meter_id: { type: string }
+        point_id: { type: string }
+        since: { type: [string, "null"] }
+        until: { type: [string, "null"] }
+        history:
+          type: array
+          items: { $ref: "#/components/schemas/HistoryBucket" }
+        count: { type: integer }
+        offset: { type: integer }
+      required: [meter_id, point_id, history, count]
+    Device:
+      type: object
+      properties:
+        meter_id: { type: string }
+        device_path: { type: string }
+        name: { type: string }
+        point_count: { type: integer }
+        updated_utc: { type: [string, "null"], format: date-time }
+      required: [meter_id]
+    Alarm:
+      description: |
+        A water-meter anomaly finding, or a BMS requirement finding when
+        `source: obix_validation`.
+      type: object
+      properties:
+        id: { type: integer }
+        meter_id: { type: string }
+        point_id: { type: string }
+        kind: { type: string }
+        rule:
+          type: string
+          description: Rule that fired (e.g. out_of_range, stale).
+        source:
+          type: string
+          enum: [obix_validation]
+          description: Present only for BMS requirement findings.
+        severity: { type: string, enum: [info, warning, critical] }
+        message: { type: string }
+        value: { type: [number, "null"] }
+        text_value: { type: [string, "null"] }
+        unit: { type: string }
+        detail: { type: object, additionalProperties: true }
+        opened_utc: { type: string, format: date-time }
+        bucket_utc: { type: string, format: date-time }
+        created_utc: { type: string, format: date-time }
+        resolved_utc: { type: [string, "null"], format: date-time }
+    Status:
+      type: object
+      properties:
+        enabled: { type: boolean }
+        last_run:
+          oneOf:
+            - type: "null"
+            - type: object
+              properties:
+                started_utc: { type: string }
+                finished_utc: { type: string }
+                points_ok: { type: integer }
+                points_failed: { type: integer }
+                duration_ms: { type: integer }
+        obix_device: { type: integer }
+        obix_point: { type: integer }
+        obix_point_value: { type: integer }
+        obix_point_history: { type: integer }
+        obix_read_run: { type: integer }
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        detail: { type: string }
+      required: [error]
+
+  responses:
+    BadRequest:
+      description: Missing or invalid parameters.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Missing or invalid bearer token.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: The caller may not read this meter.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: No such meter or point.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }

@@ -1,4 +1,4 @@
-"""Extraction cycle orchestration: office MySQL -> local SQLite buffer.
+"""Extraction cycle orchestration: office MySQL -> local MySQL buffer.
 
 One cycle:
 
@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from .store import SQLiteBuffer
+from .store import MySQLBuffer
 
 WATERMARK_KIND = "receive_packet.id"
 
@@ -55,7 +55,7 @@ def _build_snapshot(
 
 
 def run_cycle(
-    buffer: SQLiteBuffer,
+    buffer: MySQLBuffer,
     extractor: Any,
     batch_size: int = 500,
     retention_hours: float = 24.0,

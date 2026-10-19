@@ -33,7 +33,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 5 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 6 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -65,7 +65,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 14 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 15 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -97,7 +97,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 23 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 24 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -129,7 +129,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 32 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 33 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -161,7 +161,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 41 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 42 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -193,7 +193,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 50 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 51 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -225,7 +225,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 59 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 60 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -257,7 +257,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 68 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 69 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -289,7 +289,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 77 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 78 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -321,7 +321,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 86 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 87 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -353,7 +353,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 95 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 96 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
@@ -385,7 +385,7 @@ meters:
         modbus: { register_type: holding, address: 40009, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 104 }  # [DRAFT pending BMS point list]
       battery:
-        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 0.001, byte_order: big, word_order: big, rw: R }  # [DRAFT]
+        modbus: { register_type: holding, address: 40011, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]
         bacnet: { object: AI, instance: 105 }  # [DRAFT pending BMS point list]
       signal:
         modbus: { register_type: holding, address: 40013, dtype: float32, scale: 1.0, byte_order: big, word_order: big, rw: R }  # [DRAFT]

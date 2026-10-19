@@ -180,11 +180,12 @@ def test_normalizer_persists_points_and_consumes_events(buffer):
 
 
 def test_normalizer_replays_events_after_failure(buffer):
-    buffer._conn.execute(
-        "INSERT INTO stage_events(source_table, source_key, payload, captured_utc, state)"
-        " VALUES (?, ?, ?, ?, ?)",
-        ("receive_packet", "1", "{not json}", "2026-09-14T00:00:00Z", "new"),
-    )
+    with buffer._conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO stage_events(source_table, source_key, payload, captured_utc, state)"
+            " VALUES (%s, %s, %s, %s, %s)",
+            ("receive_packet", "1", "{not json}", "2026-09-14T00:00:00Z", "new"),
+        )
     result = Normalizer().run(buffer)
     assert result.events_failed == 1
     pending = buffer.pending_events()

@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .config import BasePointsConfig, MetersConfig
-from .store import SQLiteBuffer
+from .store import MySQLBuffer
 
 # Microsoft-style float32: 2 x 16-bit words.
 _FLOAT32_WORDS = 2
@@ -233,7 +233,7 @@ class MappingEngine:
             spans.setdefault(mb.register_type, []).append(span)
 
     # ── live values ──────────────────────────────────────────────────────
-    def live(self, buffer: SQLiteBuffer) -> dict[str, dict[str, float]]:
+    def live(self, buffer: MySQLBuffer) -> dict[str, dict[str, float]]:
         """Project current normalized values per meter (canonical values,
         not yet scaled/encoded)."""
         live: dict[str, dict[str, float]] = {}

@@ -29,7 +29,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-from .store import SQLiteBuffer
+from .store import MySQLBuffer
 
 OFFICE_TZ = timezone(timedelta(hours=8))
 
@@ -202,7 +202,7 @@ class Normalizer:
 
     def run(
         self,
-        buffer: SQLiteBuffer,
+        buffer: MySQLBuffer,
         now: Optional[datetime] = None,
     ) -> NormalizeResult:
         start = time.monotonic()

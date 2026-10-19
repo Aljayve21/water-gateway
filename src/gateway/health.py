@@ -85,6 +85,7 @@ class HealthMonitor:
         fingerprint: dict[str, Any],
         buffer_probe: Optional[Callable[[], dict[str, Any]]] = None,
         protocol_probe: Optional[Callable[[], dict[str, Any]]] = None,
+        ai_probe: Optional[Callable[[], dict[str, Any]]] = None,
     ) -> None:
         self.host = host
         self.port = port
@@ -92,6 +93,7 @@ class HealthMonitor:
         self.fingerprint = fingerprint
         self._buffer_probe = buffer_probe or (lambda: {})
         self._protocol_probe = protocol_probe or (lambda: {})
+        self._ai_probe = ai_probe or (lambda: {"enabled": False})
         self._server: asyncio.AbstractServer | None = None
         self._started_monotonic: Optional[float] = None
 
@@ -192,6 +194,11 @@ class HealthMonitor:
         except Exception as exc:  # noqa: BLE001 - report, never raise
             protocols = {"error": str(exc)}
             status = "degraded"
+        ai: dict[str, Any]
+        try:
+            ai = self._ai_probe() or {}
+        except Exception as exc:  # noqa: BLE001 - report, never raise
+            ai = {"error": str(exc)}
         return {
             "service": "water-gateway",
             "status": status,
@@ -202,6 +209,7 @@ class HealthMonitor:
             else 0.0,
             "buffer": buffer_counts,
             "protocols": protocols,
+            "ai": ai,
             "last_cycle": self.state.last_cycle,
             "last_normalize": self.state.last_normalize,
             "last_sync_utc": self.state.last_sync_utc,

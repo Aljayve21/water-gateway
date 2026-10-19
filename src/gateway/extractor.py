@@ -4,7 +4,7 @@ Hard contract: this module performs SELECT / WITH queries ONLY. Every
 statement is constructed from constants, verified by :func:`_check_read_only`
 at execution time, and parameterized with ``%s`` placeholders (never string
 interpolated). It never writes to the office database; all staging state
-lives in the local SQLite buffer (``gateway.store``).
+lands in the local MySQL buffer (``gateway.store``).
 """
 
 from __future__ import annotations
@@ -41,7 +41,13 @@ INNER JOIN (
     FROM analy_result GROUP BY meter_id
 ) g ON r.meter_id = g.meter_id AND r.rec_date_time = g.mdt
 """
-_SQL_LAST_RECEIVE = "SELECT meter_id, receive_time FROM last_receive"
+# Some deployments expose a ``last_receive`` view holding the newest packet
+# time per meter. It is not present on every schema, so derive it from
+# receive_packet instead: identical semantics, no dependency on a view.
+_SQL_LAST_RECEIVE = (
+    "SELECT meter_id, MAX(receive_time) AS receive_time"
+    " FROM receive_packet GROUP BY meter_id"
+)
 _SQL_METER_ADDRS = "SELECT meter_id, addr FROM meter_status"
 
 

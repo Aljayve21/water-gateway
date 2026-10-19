@@ -1,0 +1,50 @@
+# findings.yaml - AI anomaly findings published BACK to the BMS.
+#
+# The measurement objects in meters.yaml are analogInput/binaryInput, which the
+# BACnet standard makes read-only. To push AI results to the BMS they must be
+# published as writable-type objects (analogValue/binaryValue), which is the
+# correct type for derived values.
+#
+# Object instances are allocated automatically from `instance_base`, stepping
+# through every published point for every meter. The measurement objects occupy
+# instances 1-108, so the base must sit above that range; the loader rejects a
+# base that would collide.
+#
+# Every `rule` value must match a rule name in gateway/ai/anomaly.py
+# (offline, alarm, battery, signal, consumption). A rule with no matching entry
+# here is simply not published - it still shows up in /api/ai/findings.
+findings:
+  enabled: true
+
+  # First BACnet instance used for findings objects. Must be above the highest
+  # instance already used in meters.yaml.
+  instance_base: 200
+
+  # binaryValue objects: one per rule, per meter.
+  # Active when a finding for that rule is currently open on that meter.
+  binary_points:
+    - rule: offline
+      label: meter offline
+    - rule: alarm
+      label: meter alarm reported
+    - rule: battery
+      label: battery low
+    - rule: signal
+      label: signal weak
+    - rule: consumption
+      label: consumption spike or suspected leak
+
+  # analogValue objects: derived summary per meter.
+  analog_points:
+    - key: max_severity
+      label: highest open severity
+    - key: finding_count
+      label: number of open findings
+
+# Severity encoding for the max_severity analogValue. The BMS reads a number,
+# so map the three levels used by anomaly.py onto 0/1/2 and document it here.
+severity_scale:
+  none: 0
+  info: 0
+  warning: 1
+  critical: 2

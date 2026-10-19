@@ -20,8 +20,14 @@ htmlcov/
 # Runtime artifacts
 logs/
 buffer/
+*.log
 *.db
 *.db-journal
 *.db-shm
 *.db-wal
 *.pid
+# runtime single-instance lock
+config/gateway.lock
+src/config/gateway.lock
+# generated Neoview facet cache (probe output)
+config/obix_facets.json
