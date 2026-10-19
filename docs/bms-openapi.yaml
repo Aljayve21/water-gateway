@@ -240,6 +240,9 @@ components:
         unit: { type: string }
         status: { type: string, example: ok }
         captured_utc: { type: [string, "null"], format: date-time }
+        writable:
+          type: boolean
+          description: True if this point is explicitly listed as writable in the gateway's write allow-list. Currently always false by default.
         requirements: { $ref: "#/components/schemas/Requirements" }
       required: [meter_id, point_id]
     Requirements:

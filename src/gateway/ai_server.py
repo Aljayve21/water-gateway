@@ -632,6 +632,36 @@ class AIServer:
             "max_age_seconds": req.max_age_seconds,
         }
 
+    def _is_writable(self, meter_id: str, point_id: str) -> bool:
+        """Return True only if the point is explicitly listed as writable.
+
+        At present writes are disabled by default (config/obix.yaml has write: {})
+        so this returns False for everything. When the write allow-list is
+        populated, it must be consulted here so the read API reflects it.
+        """
+        try:
+            write_map = getattr(self.tools, "write_map", None) if self.tools else None
+        except Exception:  # noqa: BLE001
+            write_map = None
+        if not write_map:
+            try:
+                from .config import obix_write_map
+
+                write_map = obix_write_map()
+            except Exception:  # noqa: BLE001
+                write_map = {}
+        try:
+            meter_map = write_map.get(meter_id, {}) or write_map.get(str(meter_id), {})
+            if not meter_map:
+                # also accept top-level keys by point_id? write_map is meter_id->point_id->href
+                for m, pm in (write_map or {}).items():
+                    if point_id in pm or str(point_id) in pm:
+                        return True
+                return False
+            return (point_id in meter_map) or (str(point_id) in meter_map)
+        except Exception:  # noqa: BLE001 - never fail a read for metadata
+            return False
+
     def _attach_requirements(self, row: dict[str, Any]) -> dict[str, Any]:
         """Add the ``requirements`` block to a point row, in place."""
         found = self._requirements_for(
@@ -641,6 +671,10 @@ class AIServer:
         )
         if found is not None:
             row["requirements"] = found
+        row["writable"] = self._is_writable(
+            str(row.get("meter_id") or ""),
+            str(row.get("point_id") or ""),
+        )
         return row
 
     def _bms_points(self, principal: Principal, query: str = "") -> dict[str, Any]:

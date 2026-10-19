@@ -349,7 +349,7 @@ class TestBmsWithObixStore:
             "allowed",
             "max_age_seconds",
         }
-
+        assert body["writable"] is False
     def test_points_list_exposes_requirements(self, tools, resolver, obix):
         self._seed(obix)
         server = self._server_with_requirements(
