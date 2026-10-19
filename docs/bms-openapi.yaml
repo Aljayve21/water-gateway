@@ -240,7 +240,30 @@ components:
         unit: { type: string }
         status: { type: string, example: ok }
         captured_utc: { type: [string, "null"], format: date-time }
+        requirements: { $ref: "#/components/schemas/Requirements" }
       required: [meter_id, point_id]
+    Requirements:
+      description: |
+        What the point value *should* be, resolved the same way the validator
+        resolves it (generic unit bounds -> live Neoview facets -> an explicit
+        per-point override). Present only when requirements are configured.
+      type: object
+      properties:
+        unit:
+          type: [string, "null"]
+          description: Expected reported unit.
+        min: { type: [number, "null"] }
+        max: { type: [number, "null"] }
+        tolerance:
+          type: [number, "null"]
+          description: Slack applied to min/max, from a Neoview precision facet.
+        allowed:
+          type: [array, "null"]
+          items: { type: string }
+          description: Allowed values for an enum/state point.
+        max_age_seconds:
+          type: [number, "null"]
+          description: Beyond this age the reading is stale.
     PointDetail:
       allOf:
         - $ref: "#/components/schemas/PointValue"

@@ -311,6 +311,63 @@ class TestBmsWithObixStore:
         assert body["value"] == 22.5
         assert body["unit"] == "degC"
 
+    def test_point_detail_exposes_requirements(self, tools, resolver, obix):
+        self._seed(obix)  # temp unit degC
+        server = self._server_with_requirements(
+            tools,
+            resolver,
+            obix,
+            ObixRequirements(
+                points={
+                    "bms_enyecontrols/temp": {"min": 15.0, "max": 35.0, "unit": "degC"}
+                }
+            ),
+        )
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/temp")
+        assert status == 200
+        assert body["requirements"] == {
+            "unit": "degC",
+            "min": 15.0,
+            "max": 35.0,
+            "tolerance": None,
+            "allowed": None,
+            "max_age_seconds": None,
+        }
+
+    def test_point_detail_includes_requirements_block(self, obix_server, obix):
+        # With an oBIX store the server auto-builds a validator from
+        # config/obix_requirements.yaml, so every point read carries the block
+        # (possibly all-null when nothing is configured for that point).
+        self._seed(obix)
+        status, body = _call(obix_server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/temp")
+        assert status == 200
+        assert set(body["requirements"]) == {
+            "unit",
+            "min",
+            "max",
+            "tolerance",
+            "allowed",
+            "max_age_seconds",
+        }
+
+    def test_points_list_exposes_requirements(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._server_with_requirements(
+            tools,
+            resolver,
+            obix,
+            ObixRequirements(points={"bms_enyecontrols/temp": {"min": 15.0, "max": 35.0}}),
+        )
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points")
+        assert status == 200
+        temp = next(p for p in body["points"] if p["point_id"] == "temp")
+        assert temp["requirements"]["min"] == 15.0
+        assert temp["requirements"]["max"] == 35.0
+        # A point with no configured band still carries the block, with nulls.
+        flow = next(p for p in body["points"] if p["point_id"] == "flow")
+        assert flow["requirements"]["min"] is None
+        assert flow["requirements"]["max"] is None
+
     def test_missing_point_is_404(self, obix_server, obix):
         self._seed(obix)
         status, body = _call(obix_server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/nope")

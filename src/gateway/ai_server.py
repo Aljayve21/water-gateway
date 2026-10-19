@@ -606,6 +606,43 @@ class AIServer:
             return None
         return [str(m) for m in (getattr(principal, "meters", ()) or ())]
 
+    def _requirements_for(
+        self, meter_id: str, point_id: str, unit: Optional[str]
+    ) -> Optional[dict[str, Any]]:
+        """The resolved band for a point, or ``None`` when no validator is wired.
+
+        This is informational only: it mirrors exactly what the validator
+        compares a value against (``min``/``max``/``tolerance``/``allowed`` and
+        the expected ``unit``), so a caller can see *why* a reading is in or out
+        of range. A broken config never breaks a read.
+        """
+        if self.obix_validator is None:
+            return None
+        try:
+            req = self.obix_validator.requirements.resolve(meter_id, point_id, unit)
+        except Exception:  # noqa: BLE001 - metadata must never fail a read
+            log.warning("could not resolve requirements for %s/%s", meter_id, point_id)
+            return None
+        return {
+            "unit": req.unit,
+            "min": req.min_value,
+            "max": req.max_value,
+            "tolerance": req.tolerance or None,
+            "allowed": list(req.allowed) or None,
+            "max_age_seconds": req.max_age_seconds,
+        }
+
+    def _attach_requirements(self, row: dict[str, Any]) -> dict[str, Any]:
+        """Add the ``requirements`` block to a point row, in place."""
+        found = self._requirements_for(
+            str(row.get("meter_id") or ""),
+            str(row.get("point_id") or ""),
+            row.get("unit"),
+        )
+        if found is not None:
+            row["requirements"] = found
+        return row
+
     def _bms_points(self, principal: Principal, query: str = "") -> dict[str, Any]:
         meter_id = _query_str(query, "meter_id")
         if meter_id and not principal.can_access(meter_id):
@@ -639,6 +676,9 @@ class AIServer:
                     )
             total = len(rows)
             rows = rows[offset:] if limit is None else rows[offset : offset + limit]
+
+        for row in rows:
+            self._attach_requirements(row)
 
         return {
             "meters": sorted({r["meter_id"] for r in rows}),
@@ -675,6 +715,9 @@ class AIServer:
             ]
             total = len(all_points)
             points = all_points[offset:] if limit is None else all_points[offset : offset + limit]
+        for point in points:
+            self._attach_requirements(point)
+
         return {
             "meter_id": meter_id,
             "points": points,
@@ -694,7 +737,7 @@ class AIServer:
         row = self.obix_store.point(meter_id, point_id)
         if row is None:
             return {"error": "not found", "meter_id": meter_id, "point_id": point_id}
-        return dict(row)
+        return self._attach_requirements(dict(row))
 
     def _bms_devices(self, principal: Principal) -> dict[str, Any]:
         devs: list[dict[str, Any]] = []

@@ -82,6 +82,8 @@ python scripts\bms_smoke.py         # hit the /bms/* HTTP endpoints
 is reachable its own facets (read by the probe) are preferred, then the cache,
 then this file. Point-level `points:` entries always win.
 
+`/bms/*` point responses now include a `requirements` block (unit/min/max/tolerance/allowed/max_age_seconds), resolved the same way as the validator. See `docs/bms-openapi.yaml` for details.
+
 ## Read-only contract
 
 - Requires a MySQL account with **SELECT only** on the office `mdpf` tables the

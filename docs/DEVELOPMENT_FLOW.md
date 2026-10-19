@@ -73,6 +73,13 @@ control → cloud**. Each step earns the trust the next one needs.
 > The AWS build has its own finer schedule in
 > [`docs/AWS_BMS_AGENT_ARCHITECTURE.md`](AWS_BMS_AGENT_ARCHITECTURE.md) §7.
 > Phase 9 here = Phases 1–3 there.
+>
+> **Read API metadata:** `/bms/points` and its per-device/per-point variants now
+> include a `requirements` block (expected `unit`, `min`, `max`, `tolerance`,
+> `allowed`, `max_age_seconds`) resolved the *same way the validator resolves it*
+> (`unit_bounds` → live Neoview facets → explicit override). A caller can see the
+> band a value is judged against, without a second endpoint. Contract in
+> [`docs/bms-openapi.yaml`](bms-openapi.yaml) (`Requirements`).
 
 ---
 
