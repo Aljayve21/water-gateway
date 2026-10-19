@@ -19,6 +19,7 @@ from gateway.ai.roles import Principal, PrincipalEntry, StaticPrincipalResolver
 from gateway.ai.tools import MeterTools
 from gateway.ai_server import AIServer
 from gateway.config import BasePoint, BasePointsConfig, MeterConfig, MetersConfig
+from gateway.equipment import EquipmentMap
 from gateway.obix_store import ObixStore
 from gateway.obix_validation import ObixRequirements, ObixValidator
 from gateway.store import MySQLBuffer
@@ -599,3 +600,158 @@ class TestBmsTools:
         ).for_principal(Principal.consumer("maria", ("WTR-001",)))
         payload = json.loads(bound.dispatch("list_bms_findings", {}))
         assert payload["count"] == 0
+
+
+class TestBmsEquipmentNaming:
+    """Equipment <-> point naming, exposed on every point read."""
+
+    def _seed(self, obix):
+        obix.sync_device(
+            "bms_enyecontrols",
+            "/config/Drivers/BacnetNetwork/ENYECONTROLS/points",
+            [
+                {
+                    "rel_path": "zone1/temp",
+                    "href": "z1/temp",
+                    "point_id": "temp",
+                    "name": "Temp",
+                    "is_folder": False,
+                    "depth": 1,
+                },
+                {
+                    "rel_path": "zone1/flow",
+                    "href": "z1/flow",
+                    "point_id": "flow",
+                    "name": "Flow",
+                    "is_folder": False,
+                    "depth": 1,
+                },
+            ],
+            name="ENYECONTROLS",
+        )
+        obix.record_values(
+            {("bms_enyecontrols", "temp"): (21.5, "degC")},
+            captured_utc="2026-10-15T01:00:00+00:00",
+        )
+
+    def _server(self, tools, resolver, obix, equipment_map):
+        return AIServer(
+            "127.0.0.1",
+            0,
+            _StubClient(),
+            tools,
+            _StubAssistant(),
+            "x" * 40,
+            rate_limit_per_min=10,
+            summary_writer=None,
+            resolver=resolver,
+            obix_store=obix,
+            equipment_map=equipment_map,
+        )
+
+    def _mapped(self, tools, resolver, obix):
+        return self._server(
+            tools,
+            resolver,
+            obix,
+            EquipmentMap.from_dict(
+                {
+                    "devices": {"bms_enyecontrols": "AHU-01"},
+                    "points": {"bms_enyecontrols/temp": "SpaceTemp"},
+                }
+            ),
+        )
+
+    def test_point_detail_exposes_equipment_names(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/temp")
+        assert status == 200
+        assert body["equipment_id"] == "AHU-01"
+        assert body["equipment_point"] == "SpaceTemp"
+
+    def test_unmapped_point_falls_back_to_station_name(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/flow")
+        assert status == 200
+        # Device name is mapped; the point itself is not, so it keeps its
+        # station name rather than erroring.
+        assert body["equipment_id"] == "AHU-01"
+        assert body["equipment_point"] == "Flow"
+
+    def test_points_list_carries_equipment_names(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points")
+        assert status == 200
+        temp = next(p for p in body["points"] if p["point_id"] == "temp")
+        assert temp["equipment_id"] == "AHU-01"
+        assert temp["equipment_point"] == "SpaceTemp"
+
+    def test_equipment_path_addressing(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/AHU-01/SpaceTemp")
+        assert status == 200
+        assert body["meter_id"] == "bms_enyecontrols"
+        assert body["point_id"] == "temp"
+        assert body["value"] == 21.5
+
+    def test_station_id_path_still_works_with_map_present(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/bms_enyecontrols/temp")
+        assert status == 200
+        assert body["point_id"] == "temp"
+
+    def test_unknown_equipment_address_is_404(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/points/AHU-99/Nope")
+        assert status == 404
+        assert body["error"] == "not found"
+        assert body["equipment_id"] == "AHU-99"
+
+    def test_equipment_listing_maps_both_ways(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/equipment")
+        assert status == 200
+        assert body["count"] == 2
+        temp = next(
+            r for r in body["equipment"] if r["point_id"] == "temp"
+        )
+        assert temp == {
+            "meter_id": "bms_enyecontrols",
+            "point_id": "temp",
+            "equipment_id": "AHU-01",
+            "equipment_point": "SpaceTemp",
+        }
+        assert body["map"]["devices_mapped"] == 1
+        assert body["map"]["points_mapped"] == 1
+
+    def test_equipment_listing_filters_by_query(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        status, body = _call(server, ADMIN_TOKEN, "/bms/equipment", "q=space")
+        assert status == 200
+        assert body["count"] == 1
+        assert body["equipment"][0]["equipment_point"] == "SpaceTemp"
+
+    def test_equipment_listing_respects_scope(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        # maria only owns WTR-001, so no BMS rows are visible.
+        status, body = _call(server, USER_TOKEN, "/bms/equipment")
+        assert status == 200
+        assert body["count"] == 0
+
+    def test_equipment_map_rejects_post(self, tools, resolver, obix):
+        self._seed(obix)
+        server = self._mapped(tools, resolver, obix)
+        writer = _Writer()
+        principal = server.resolver.resolve(ADMIN_TOKEN)
+        asyncio.run(server._route(writer, "POST", "/bms/equipment", b"", principal, ""))
+        assert _response(writer)[0] == 405
+

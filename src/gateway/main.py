@@ -707,6 +707,21 @@ async def amain(config_dir: Path | None) -> int:
             logger.info("ai signed-assertion auth disabled (AI_ASSERTION_SECRET not set)")
 
         resolver = _ChainedResolver(resolvers)
+        # Equipment <-> point naming map. Optional: a missing or empty file is
+        # valid and falls back to station names, so a load failure must not
+        # stop the server.
+        try:
+            from .equipment import EquipmentMap
+
+            equipment_map = EquipmentMap.load()
+            logger.info(
+                "equipment map: %d device(s), %d point(s) mapped",
+                len(equipment_map.devices),
+                len(equipment_map.points),
+            )
+        except Exception as exc:  # noqa: BLE001 - naming must never block startup
+            logger.warning("equipment map unavailable (%s) - using station names", exc)
+            equipment_map = None
         ai_server = AIServer(
             settings.ai_bind_host,
             settings.ai_bind_port,
@@ -719,6 +734,7 @@ async def amain(config_dir: Path | None) -> int:
             resolver=resolver,
             obix_store=obix_store,
             obix_validator=ai_obix_validator,
+            equipment_map=equipment_map,
         )
 
     health_state = MonitorState()

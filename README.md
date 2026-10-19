@@ -82,7 +82,17 @@ python scripts\bms_smoke.py         # hit the /bms/* HTTP endpoints
 is reachable its own facets (read by the probe) are preferred, then the cache,
 then this file. Point-level `points:` entries always win.
 
-`/bms/*` point responses now include a `requirements` block (unit/min/max/tolerance/allowed/max_age_seconds), resolved the same way as the validator. See `docs/bms-openapi.yaml` for details.
+`/bms/*` point responses now include a `requirements` block (unit/min/max/tolerance/allowed/max_age_seconds), resolved the same way as the validator, plus `writable` and the equipment names `equipment_id`/`equipment_point`. See `docs/bms-openapi.yaml` for details.
+
+### Equipment naming
+
+`config\equipment_map.yaml` gives points the names the plant uses
+(`AHU-01` / `SpaceTemp`) instead of their raw oBIX ids. It is optional —
+anything not listed falls back to the station's own device and point names, so
+the API works before the map is authored and keeps working when new points
+appear. `GET /bms/equipment` lists every point under both names, and
+`GET /bms/points/{equipment_id}/{equipment_point}` accepts an equipment
+address as well as a station id.
 
 ## Read-only contract
 

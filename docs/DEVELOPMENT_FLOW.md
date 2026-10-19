@@ -80,6 +80,14 @@ control → cloud**. Each step earns the trust the next one needs.
 > (`unit_bounds` → live Neoview facets → explicit override). A caller can see the
 > band a value is judged against, without a second endpoint. Contract in
 > [`docs/bms-openapi.yaml`](bms-openapi.yaml) (`Requirements`).
+>
+> **Equipment naming:** point reads also carry `equipment_id`/`equipment_point`
+> — the names the plant uses (`AHU-01`/`SpaceTemp`) rather than raw oBIX ids.
+> Sourced from `config/equipment_map.yaml`, falling back to the station's own
+> device/point names for anything unmapped, so it works before the map is
+> authored. `GET /bms/equipment` lists every point under both names and
+> `GET /bms/points/{equipment_id}/{equipment_point}` accepts an equipment
+> address. See [`src/gateway/equipment.py`](../src/gateway/equipment.py).
 
 ---
 

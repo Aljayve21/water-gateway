@@ -1,0 +1,31 @@
+# equipment_map.yaml - friendly equipment names for BMS points (optional).
+#
+# Lets a caller address a point the way the plant does (AHU-01 / SpaceTemp)
+# instead of by its raw oBIX id (bms_enyecontrols / enyecontrolsbms_io_...).
+#
+# The map is entirely optional. Anything not listed falls back to the point's
+# own station name, so the API works before this file is authored and keeps
+# working when new points appear on the station.
+#
+# Two directions are supported and both are used by the read API:
+#
+#   devices: <meter_id>: <equipment_id>
+#     Equipment id for a whole BMS device. Used to annotate every point read
+#     and to resolve GET /bms/points/{equipment_id}/{equipment_point}.
+#
+#   points: "<meter_id>/<point_id>": <equipment_point>
+#     Friendly name for one point. Quote the key: it contains a slash.
+#
+# NOTE: the entries below are placeholders derived from the station's own
+# device names, not confirmed equipment names. Replace them once the controls
+# team confirms the real equipment tags (see docs/CONTROLS_TEAM_REQUEST.md).
+
+devices:
+  # Neoview station device "ENYECONTROLS" (BACnet room controller).
+  bms_enyecontrols: ENYECONTROLS
+  # Schneider iEM3265 power/water metering module.
+  bms_iem3265_0020343063: IEM3265
+
+# Friendly point names. Add entries as the controls team confirms them, e.g.:
+#   "bms_enyecontrols/enyecontrolsbms_io_mezz_tr_temp_reading": Mezz_TR_Temp
+points: {}

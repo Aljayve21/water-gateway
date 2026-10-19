@@ -75,6 +75,12 @@ paths:
     get:
       tags: [bms]
       summary: Get one point's catalog metadata and latest value.
+      description: |
+        The two segments may be either station ids (`meter_id`/`point_id`) or
+        equipment names (`equipment_id`/`equipment_point`) from
+        `config/equipment_map.yaml`. Station ids win on a collision, so an
+        equipment name can never shadow a real device. An address that matches
+        neither answers 404.
       parameters:
         - $ref: "#/components/parameters/MeterId"
         - $ref: "#/components/parameters/PointId"
@@ -181,6 +187,47 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
 
+  /bms/equipment:
+    get:
+      tags: [bms]
+      summary: Map between equipment names and station point ids.
+      description: |
+        Every point under both its names, so a caller can go from either to
+        the other without guessing. `equipment_id`/`equipment_point` come from
+        `config/equipment_map.yaml`, falling back to the station's own device
+        and point names for anything not yet mapped.
+
+        Optional filters: `q` matches either name (equipment or station),
+        `meter_id` limits to one device. Rows are scoped to the caller.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Substring match against either name.
+          schema: { type: string }
+        - name: meter_id
+          in: query
+          required: false
+          description: Only this device.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Equipment-to-station mapping.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipment:
+                    type: array
+                    items: { $ref: "#/components/schemas/EquipmentAddress" }
+                  count: { type: integer }
+                  map:
+                    type: object
+                    description: How much of the map is authored vs station-derived.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -243,6 +290,18 @@ components:
         writable:
           type: boolean
           description: True if this point is explicitly listed as writable in the gateway's write allow-list. Currently always false by default.
+        equipment_id:
+          type: string
+          description: |
+            Friendly equipment name for the device, resolved from
+            `config/equipment_map.yaml`, else the station's own device name,
+            else `meter_id`. Lets a caller address the point the way the plant
+            does (AHU-01) instead of by its raw oBIX id.
+        equipment_point:
+          type: string
+          description: |
+            Friendly point name, resolved the same way as `equipment_id`.
+            A point with no entry falls back to its station name.
         requirements: { $ref: "#/components/schemas/Requirements" }
       required: [meter_id, point_id]
     Requirements:
@@ -267,6 +326,15 @@ components:
         max_age_seconds:
           type: [number, "null"]
           description: Beyond this age the reading is stale.
+    EquipmentAddress:
+      description: One point under both its station ids and its equipment names.
+      type: object
+      properties:
+        meter_id: { type: string }
+        point_id: { type: string }
+        equipment_id: { type: string }
+        equipment_point: { type: string }
+      required: [meter_id, point_id, equipment_id, equipment_point]
     PointDetail:
       allOf:
         - $ref: "#/components/schemas/PointValue"

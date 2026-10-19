@@ -32,6 +32,7 @@ from .ai.agent import Assistant
 from .ai.bedrock import BedrockClient, BedrockError, CircuitOpen
 from .ai.roles import Principal, PrincipalResolver, Role, StaticPrincipalResolver
 from .ai.tools import MeterTools
+from .equipment import EquipmentMap
 from .obix_store import ObixStore, build_obix_store
 from .obix_validation import SEVERITY_ORDER, ObixValidator, load_requirements
 
@@ -173,6 +174,7 @@ class AIServer:
         resolver: Optional[PrincipalResolver] = None,
         obix_store: Optional[ObixStore] = None,
         obix_validator: Optional[ObixValidator] = None,
+        equipment_map: Optional[EquipmentMap] = None,
     ) -> None:
         self.host = host
         self.port = port
@@ -191,6 +193,10 @@ class AIServer:
                 self.obix_validator = ObixValidator(load_requirements())
             except Exception:  # noqa: BLE001 - a bad config must not stop the server
                 self.obix_validator = None
+        # Equipment <-> point naming map (config/equipment_map.yaml). Optional:
+        # a missing or empty file is valid and falls back to station names, so
+        # this must never stop the server from starting.
+        self.equipment_map = equipment_map if equipment_map is not None else EquipmentMap()
         self.limiter = _RateLimiter(rate_limit_per_min)
         self._server: Optional[asyncio.AbstractServer] = None
         self._started_monotonic: Optional[float] = None
@@ -417,9 +423,27 @@ class AIServer:
                 result = self._bms_points_for(unquote(segments[0]).strip(), principal, query)
                 status = 403 if result.get("error") else 200
             elif len(segments) == 2:
-                result = self._bms_point(
-                    unquote(segments[0]).strip(), unquote(segments[1]).strip(), principal
-                )
+                first = unquote(segments[0]).strip()
+                second = unquote(segments[1]).strip()
+                # Accept either station ids (meter_id/point_id) or equipment
+                # names (ENYECONTROLS/Mezz_TR_Temp). Station ids win so an
+                # equipment name can never shadow a real meter_id.
+                if self.obix_store is not None and first not in self._known_meter_ids():
+                    resolved = self.equipment_map.to_station(first, second)
+                    if resolved is None:
+                        await self._json(
+                            writer,
+                            404,
+                            {
+                                "error": "not found",
+                                "equipment_id": first,
+                                "equipment_point": second,
+                                "hint": "use /bms/points to list valid ids",
+                            },
+                        )
+                        return
+                    first, second = resolved
+                result = self._bms_point(first, second, principal)
                 status = 200 if "error" not in result else (
                     403 if result["error"] == "access denied" else 404
                 )
@@ -434,6 +458,14 @@ class AIServer:
                 await self._json(writer, 405, {"error": "method not allowed"})
                 return
             await self._json(writer, 200, self._bms_devices(principal))
+            return
+
+        if path == "/bms/equipment":
+            if method not in ("GET", "HEAD"):
+                await self._json(writer, 405, {"error": "method not allowed"})
+                return
+            result = self._bms_equipment(principal, query)
+            await self._json(writer, 403 if result.get("error") else 200, result)
             return
 
         if path == "/bms/status":
@@ -662,19 +694,69 @@ class AIServer:
         except Exception:  # noqa: BLE001 - never fail a read for metadata
             return False
 
+    def _known_meter_ids(self) -> set[str]:
+        """Station meter_ids, so a path segment can be told apart from an
+        equipment name without a query per request."""
+        self._hydrate_equipment_map()
+        return set(self.equipment_map.station_devices) | set(self.equipment_map.devices)
+
+    def _hydrate_equipment_map(self) -> None:
+        """Fill in station names the map can fall back to, once per server.
+
+        The authored map only names the devices/points someone has thought
+        about. The rest still need a stable, human-readable address, so the
+        station's own device and point names are loaded here and used as the
+        fallback layer. Done lazily and once: it is a handful of small queries
+        and the names do not change while the gateway runs.
+        """
+        if self.obix_store is None or getattr(self, "_equipment_hydrated", False):
+            return
+        try:
+            self.equipment_map.with_station_names(
+                devices=self.obix_store.devices(),
+                points=self._all_station_points(),
+            )
+        except Exception:  # noqa: BLE001 - naming must never fail a read
+            pass
+        self._equipment_hydrated = True
+
+    def _all_station_points(self) -> list[dict[str, Any]]:
+        """Every catalogued point's identity (meter_id, point_id, name)."""
+        rows: list[dict[str, Any]] = []
+        for device in self.obix_store.devices():
+            meter_id = device.get("meter_id")
+            if not meter_id:
+                continue
+            for point in self.obix_store.points(str(meter_id)):
+                rows.append(
+                    {
+                        "meter_id": point.get("meter_id"),
+                        "point_id": point.get("point_id"),
+                        "name": point.get("name"),
+                    }
+                )
+        return rows
+
     def _attach_requirements(self, row: dict[str, Any]) -> dict[str, Any]:
-        """Add the ``requirements`` block to a point row, in place."""
-        found = self._requirements_for(
-            str(row.get("meter_id") or ""),
-            str(row.get("point_id") or ""),
-            row.get("unit"),
-        )
+        """Add the ``requirements`` and ``equipment`` blocks to a point row.
+
+        Applied in place so every ``/bms/points*`` shape - list, per-device,
+        single point, and the AI tools - exposes the same metadata.
+        """
+        meter_id = str(row.get("meter_id") or "")
+        point_id = str(row.get("point_id") or "")
+        found = self._requirements_for(meter_id, point_id, row.get("unit"))
         if found is not None:
             row["requirements"] = found
-        row["writable"] = self._is_writable(
-            str(row.get("meter_id") or ""),
-            str(row.get("point_id") or ""),
+        row["writable"] = self._is_writable(meter_id, point_id)
+        self._hydrate_equipment_map()
+        # A point's own station name is the best fallback for the equipment
+        # point, so pass it through rather than re-reading the catalog.
+        self.equipment_map.station_points.setdefault(
+            (meter_id.casefold(), point_id.casefold()),
+            str(row.get("name") or point_id),
         )
+        row.update(self.equipment_map.resolve(meter_id, point_id))
         return row
 
     def _bms_points(self, principal: Principal, query: str = "") -> dict[str, Any]:
@@ -787,6 +869,50 @@ class AIServer:
                 )
         visible = [d for d in devs if principal.can_access(d.get("meter_id") or "")]
         return {"devices": visible, "count": len(visible)}
+
+    def _bms_equipment(self, principal: Principal, query: str = "") -> dict[str, Any]:
+        """The equipment vocabulary: every point under both its names.
+
+        One row per point carrying both the station ids and the equipment
+        address, so a caller can go from either to the other without guessing.
+        Optionally filtered with ``?q=ahu`` (matches either name) or
+        ``?meter_id=`` (one device).
+        """
+        self._hydrate_equipment_map()
+        want_meter = _query_str(query, "meter_id")
+        if want_meter and not principal.can_access(want_meter):
+            return {"error": "access denied", "meter_id": want_meter}
+        needle = (_query_str(query, "q") or "").casefold()
+
+        rows: list[dict[str, Any]] = []
+        if self.obix_store is not None:
+            for device in self._all_station_points():
+                meter_id = str(device.get("meter_id") or "")
+                point_id = str(device.get("point_id") or "")
+                if not meter_id or not point_id or not principal.can_access(meter_id):
+                    continue
+                if want_meter and meter_id != want_meter:
+                    continue
+                entry = {
+                    "meter_id": meter_id,
+                    "point_id": point_id,
+                    **self.equipment_map.resolve(meter_id, point_id),
+                }
+                if needle and not (
+                    needle in entry["equipment_id"].casefold()
+                    or needle in entry["equipment_point"].casefold()
+                    or needle in meter_id.casefold()
+                    or needle in point_id.casefold()
+                ):
+                    continue
+                rows.append(entry)
+
+        rows.sort(key=lambda r: (r["equipment_id"], r["equipment_point"]))
+        return {
+            "equipment": rows,
+            "count": len(rows),
+            "map": self.equipment_map.summary(),
+        }
 
     def _bms_status(self, principal: Principal) -> dict[str, Any]:
         """Data freshness: last read pass and row counts (privileged only)."""
