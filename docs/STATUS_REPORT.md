@@ -1,8 +1,8 @@
 # Status Report
 
-Generated: 2026-10-19 23:44:00 UTC (updated after each feature)
+Generated: 2026-10-20 00:12:00 UTC (updated after each feature)
 Repo: water-gateway (branch: main)
-Latest commit: e84fc79
+Latest commit: b92e044
 
 ## Completed
 
@@ -11,6 +11,9 @@ Latest commit: e84fc79
 - [x] `/bms/devices`, `/bms/status` (operator-only), `/bms/history`, `/bms/alarms` (meter anomalies + oBIX findings)
 - [x] Expose `requirements` (unit/min/max/tolerance/allowed/max_age_seconds) on point reads, resolved same as validator
 - [x] Expose `writable: boolean` on point reads (defaults to false; consults write map when present)
+- [x] Expose `equipment_id`/`equipment_point` on every point read — the names the plant uses, not raw oBIX ids
+- [x] `GET /bms/equipment` — every point under both its station ids and its equipment names (filterable by `q` and `meter_id`); scoped
+- [x] `GET /bms/points/{equipment_id}/{equipment_point}` — point detail addressable by equipment name; station ids win on collision; unmatched address = 404
 
 ### oBIX / BMS
 - [x] Read 141 Neoview oBIX points → `obix` DB; hourly history
@@ -27,7 +30,8 @@ Latest commit: e84fc79
 
 ### Docs / Config / Testing
 - [x] `docs/DEVELOPMENT_FLOW.md`, `docs/bms-openapi.yaml`, `docs/AWS_BMS_AGENT_ARCHITECTURE.md`, `docs/CONTROLS_TEAM_REQUEST.md`, `docs/INNOTECH_SITE_VISIT.md`, `docs/STATUS_REPORT.md`
-- [x] `tests/test_obix_facets.py` (30), `tests/test_obix_validation.py` (14), full suite 371 passed
+- [x] `config/equipment_map.yaml` — optional equipment naming (device-level entries only so far; point names to be filled once controls confirms tags)
+- [x] `tests/test_obix_facets.py` (30), `tests/test_obix_validation.py` (14), `tests/test_equipment_map.py` (18), full suite 399 passed
 
 ## Pending (GET-only focus)
 
@@ -40,7 +44,8 @@ Latest commit: e84fc79
 - [ ] Decide `/bms/alarms` source: keep derived findings only, or also merge Neoview's native alarms (separate read)
 
 ### Mapping / Naming
-- [ ] Equipment ↔ point naming map (e.g. `AHU-01/SpaceTemp` ↔ `bms_enyecontrols/*`) — needed if consumers think in equipment
+- [x] Equipment ↔ point naming map — mechanism + API done (commit b92e044)
+- [ ] Fill in real equipment tags in `config/equipment_map.yaml` once controls confirms them (device entries now are placeholders derived from station names)
 
 ### Infra / Ops (GET-side)
 - [ ] Confirm running background gateway lifecycle (keep up / restart policy)
@@ -53,5 +58,6 @@ Latest commit: e84fc79
 - [ ] AWS mirror (API GW/Lambda/Bedrock KB/RDS/DynamoDB) — needs explicit permission + networking decision
 
 ## Notes
-- All changes since last report: added `writable: boolean` to `/bms/*` point reads (commit e84fc79). Tests: 371/371 passed.
+- Changes since last report: equipment ↔ point naming map (commit b92e044) — `equipment_id`/`equipment_point` on all `/bms/*` point reads, new `GET /bms/equipment`, and point detail addressable by equipment name. New module `src/gateway/equipment.py`, new config `config/equipment_map.yaml`, 28 new tests. Tests: 399/399 passed.
+- The naming map is optional by design: unmapped devices/points fall back to the station's own names, so nothing breaks when new points appear on the station.
 - Focus is GET-only; POST/CMMS/AWS remain frozen.
