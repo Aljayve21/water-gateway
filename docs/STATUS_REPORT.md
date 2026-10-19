@@ -1,8 +1,8 @@
 # Status Report
 
-Generated: 2026-10-20 00:12:00 UTC (updated after each feature)
+Generated: 2026-10-20 00:52:00 UTC (updated after each feature)
 Repo: water-gateway (branch: main)
-Latest commit: b92e044
+Latest commit: e7eb58e
 
 ## Completed
 
@@ -31,7 +31,8 @@ Latest commit: b92e044
 ### Docs / Config / Testing
 - [x] `docs/DEVELOPMENT_FLOW.md`, `docs/bms-openapi.yaml`, `docs/AWS_BMS_AGENT_ARCHITECTURE.md`, `docs/CONTROLS_TEAM_REQUEST.md`, `docs/INNOTECH_SITE_VISIT.md`, `docs/STATUS_REPORT.md`
 - [x] `config/equipment_map.yaml` — optional equipment naming (device-level entries only so far; point names to be filled once controls confirms tags)
-- [x] `tests/test_obix_facets.py` (30), `tests/test_obix_validation.py` (14), `tests/test_equipment_map.py` (18), full suite 399 passed
+- [x] `tests/test_obix_facets.py` (30), `tests/test_obix_validation.py` (14), `tests/test_equipment_map.py` (20), full suite 401 passed
+- [x] `scripts/bms_smoke.py` covers `/bms/equipment` and the equipment-address round-trip (kept to ≤10 requests so it never trips the 10/min limiter)
 
 ## Pending (GET-only focus)
 
@@ -58,6 +59,6 @@ Latest commit: b92e044
 - [ ] AWS mirror (API GW/Lambda/Bedrock KB/RDS/DynamoDB) — needs explicit permission + networking decision
 
 ## Notes
-- Changes since last report: equipment ↔ point naming map (commit b92e044) — `equipment_id`/`equipment_point` on all `/bms/*` point reads, new `GET /bms/equipment`, and point detail addressable by equipment name. New module `src/gateway/equipment.py`, new config `config/equipment_map.yaml`, 28 new tests. Tests: 399/399 passed.
-- The naming map is optional by design: unmapped devices/points fall back to the station's own names, so nothing breaks when new points appear on the station.
+- Changes since last report: equipment ↔ point naming map — `equipment_id`/`equipment_point` on all `/bms/*` point reads, new `GET /bms/equipment`, and point detail addressable by equipment name (commits b92e044, e7eb58e). New module `src/gateway/equipment.py`, new config `config/equipment_map.yaml`. Live-verified: `/bms/equipment` lists 141 points and `GET /bms/points/ENYECONTROLS/2f_btu_reading_ai17` resolves back to the same point. Tests: 401/401 passed.
+- The naming map is optional by design: unmapped devices/points fall back to the station's own names, and every name the API hands out round-trips back to its point (fixed in e7eb58e).
 - Focus is GET-only; POST/CMMS/AWS remain frozen.
