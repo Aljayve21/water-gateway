@@ -1,0 +1,1158 @@
+{
+  "ip": "192.168.1.122",
+  "device_instance": 1001,
+  "objects": [
+    {
+      "type": "binary-value",
+      "instance": 200,
+      "name": "026026060001:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 201,
+      "name": "026026060001:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 202,
+      "name": "026026060001:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 203,
+      "name": "026026060001:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 204,
+      "name": "026026060001:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 205,
+      "name": "026026060001:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 206,
+      "name": "026026060001:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 207,
+      "name": "026026060002:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 208,
+      "name": "026026060002:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 209,
+      "name": "026026060002:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 210,
+      "name": "026026060002:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 211,
+      "name": "026026060002:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 212,
+      "name": "026026060002:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 213,
+      "name": "026026060002:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 214,
+      "name": "026026060003:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 215,
+      "name": "026026060003:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 216,
+      "name": "026026060003:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 217,
+      "name": "026026060003:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 218,
+      "name": "026026060003:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 219,
+      "name": "026026060003:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 220,
+      "name": "026026060003:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 221,
+      "name": "026026060004:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 222,
+      "name": "026026060004:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 223,
+      "name": "026026060004:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 224,
+      "name": "026026060004:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 225,
+      "name": "026026060004:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 226,
+      "name": "026026060004:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 227,
+      "name": "026026060004:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 228,
+      "name": "026026060005:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 229,
+      "name": "026026060005:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 230,
+      "name": "026026060005:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 231,
+      "name": "026026060005:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 232,
+      "name": "026026060005:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 233,
+      "name": "026026060005:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 234,
+      "name": "026026060005:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 235,
+      "name": "026026060006:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 236,
+      "name": "026026060006:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 237,
+      "name": "026026060006:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 238,
+      "name": "026026060006:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 239,
+      "name": "026026060006:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 240,
+      "name": "026026060006:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 241,
+      "name": "026026060006:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 242,
+      "name": "026026060007:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 243,
+      "name": "026026060007:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 244,
+      "name": "026026060007:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 245,
+      "name": "026026060007:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 246,
+      "name": "026026060007:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 247,
+      "name": "026026060007:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 248,
+      "name": "026026060007:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 249,
+      "name": "026026060008:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 250,
+      "name": "026026060008:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 251,
+      "name": "026026060008:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 252,
+      "name": "026026060008:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 253,
+      "name": "026026060008:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 254,
+      "name": "026026060008:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 255,
+      "name": "026026060008:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 256,
+      "name": "026026060009:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 257,
+      "name": "026026060009:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 258,
+      "name": "026026060009:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 259,
+      "name": "026026060009:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 260,
+      "name": "026026060009:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 261,
+      "name": "026026060009:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 262,
+      "name": "026026060009:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 263,
+      "name": "057A26060001:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 264,
+      "name": "057A26060001:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 265,
+      "name": "057A26060001:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 266,
+      "name": "057A26060001:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 267,
+      "name": "057A26060001:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 268,
+      "name": "057A26060001:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 269,
+      "name": "057A26060001:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 270,
+      "name": "057A26060002:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 271,
+      "name": "057A26060002:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 272,
+      "name": "057A26060002:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 273,
+      "name": "057A26060002:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 274,
+      "name": "057A26060002:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 275,
+      "name": "057A26060002:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 276,
+      "name": "057A26060002:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "binary-value",
+      "instance": 277,
+      "name": "057A26060003:ai_offline",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 278,
+      "name": "057A26060003:ai_alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 279,
+      "name": "057A26060003:ai_battery",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 280,
+      "name": "057A26060003:ai_signal",
+      "value": "inactive"
+    },
+    {
+      "type": "binary-value",
+      "instance": 281,
+      "name": "057A26060003:ai_consumption",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-value",
+      "instance": 282,
+      "name": "057A26060003:ai_max_severity",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-value",
+      "instance": 283,
+      "name": "057A26060003:ai_finding_count",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 1,
+      "name": "026026060001:totalizer",
+      "value": "3.184499979019165"
+    },
+    {
+      "type": "analog-input",
+      "instance": 2,
+      "name": "026026060001:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 3,
+      "name": "026026060001:reverse",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 4,
+      "name": "026026060001:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 5,
+      "name": "026026060001:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 6,
+      "name": "026026060001:battery",
+      "value": "3.630000114440918"
+    },
+    {
+      "type": "analog-input",
+      "instance": 7,
+      "name": "026026060001:signal",
+      "value": "-86.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 8,
+      "name": "026026060001:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 9,
+      "name": "026026060001:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 10,
+      "name": "026026060002:totalizer",
+      "value": "3.20770001411438"
+    },
+    {
+      "type": "analog-input",
+      "instance": 11,
+      "name": "026026060002:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 12,
+      "name": "026026060002:reverse",
+      "value": "0.0003000000142492354"
+    },
+    {
+      "type": "analog-input",
+      "instance": 13,
+      "name": "026026060002:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 14,
+      "name": "026026060002:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 15,
+      "name": "026026060002:battery",
+      "value": "3.5999999046325684"
+    },
+    {
+      "type": "analog-input",
+      "instance": 16,
+      "name": "026026060002:signal",
+      "value": "-117.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 17,
+      "name": "026026060002:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 18,
+      "name": "026026060002:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 19,
+      "name": "026026060003:totalizer",
+      "value": "109.56111145019531"
+    },
+    {
+      "type": "analog-input",
+      "instance": 20,
+      "name": "026026060003:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 21,
+      "name": "026026060003:reverse",
+      "value": "0.0005600000149570405"
+    },
+    {
+      "type": "analog-input",
+      "instance": 22,
+      "name": "026026060003:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 23,
+      "name": "026026060003:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 24,
+      "name": "026026060003:battery",
+      "value": "3.619999885559082"
+    },
+    {
+      "type": "analog-input",
+      "instance": 25,
+      "name": "026026060003:signal",
+      "value": "-112.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 26,
+      "name": "026026060003:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 27,
+      "name": "026026060003:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 28,
+      "name": "026026060004:totalizer",
+      "value": "3.420099973678589"
+    },
+    {
+      "type": "analog-input",
+      "instance": 29,
+      "name": "026026060004:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 30,
+      "name": "026026060004:reverse",
+      "value": "9.999999747378752e-05"
+    },
+    {
+      "type": "analog-input",
+      "instance": 31,
+      "name": "026026060004:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 32,
+      "name": "026026060004:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 33,
+      "name": "026026060004:battery",
+      "value": "3.700000047683716"
+    },
+    {
+      "type": "analog-input",
+      "instance": 34,
+      "name": "026026060004:signal",
+      "value": "-121.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 35,
+      "name": "026026060004:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 36,
+      "name": "026026060004:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 37,
+      "name": "026026060005:totalizer",
+      "value": "104.78929901123047"
+    },
+    {
+      "type": "analog-input",
+      "instance": 38,
+      "name": "026026060005:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 39,
+      "name": "026026060005:reverse",
+      "value": "9.999999747378752e-05"
+    },
+    {
+      "type": "analog-input",
+      "instance": 40,
+      "name": "026026060005:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 41,
+      "name": "026026060005:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 42,
+      "name": "026026060005:battery",
+      "value": "3.619999885559082"
+    },
+    {
+      "type": "analog-input",
+      "instance": 43,
+      "name": "026026060005:signal",
+      "value": "-83.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 44,
+      "name": "026026060005:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 45,
+      "name": "026026060005:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 46,
+      "name": "026026060006:totalizer",
+      "value": "157.2061767578125"
+    },
+    {
+      "type": "analog-input",
+      "instance": 47,
+      "name": "026026060006:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 48,
+      "name": "026026060006:reverse",
+      "value": "0.0022100000642240047"
+    },
+    {
+      "type": "analog-input",
+      "instance": 49,
+      "name": "026026060006:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 50,
+      "name": "026026060006:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 51,
+      "name": "026026060006:battery",
+      "value": "3.5999999046325684"
+    },
+    {
+      "type": "analog-input",
+      "instance": 52,
+      "name": "026026060006:signal",
+      "value": "-65.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 53,
+      "name": "026026060006:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 54,
+      "name": "026026060006:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 55,
+      "name": "026026060007:totalizer",
+      "value": "3.3171000480651855"
+    },
+    {
+      "type": "analog-input",
+      "instance": 56,
+      "name": "026026060007:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 57,
+      "name": "026026060007:reverse",
+      "value": "0.00019999999494757503"
+    },
+    {
+      "type": "analog-input",
+      "instance": 58,
+      "name": "026026060007:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 59,
+      "name": "026026060007:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 60,
+      "name": "026026060007:battery",
+      "value": "3.5999999046325684"
+    },
+    {
+      "type": "analog-input",
+      "instance": 61,
+      "name": "026026060007:signal",
+      "value": "-116.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 62,
+      "name": "026026060007:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 63,
+      "name": "026026060007:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 64,
+      "name": "026026060008:totalizer",
+      "value": "22.738500595092773"
+    },
+    {
+      "type": "analog-input",
+      "instance": 65,
+      "name": "026026060008:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 66,
+      "name": "026026060008:reverse",
+      "value": "0.00019999999494757503"
+    },
+    {
+      "type": "analog-input",
+      "instance": 67,
+      "name": "026026060008:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 68,
+      "name": "026026060008:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 69,
+      "name": "026026060008:battery",
+      "value": "3.609999895095825"
+    },
+    {
+      "type": "analog-input",
+      "instance": 70,
+      "name": "026026060008:signal",
+      "value": "-95.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 71,
+      "name": "026026060008:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 72,
+      "name": "026026060008:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 73,
+      "name": "026026060009:totalizer",
+      "value": "50.26940155029297"
+    },
+    {
+      "type": "analog-input",
+      "instance": 74,
+      "name": "026026060009:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 75,
+      "name": "026026060009:reverse",
+      "value": "0.011900000274181366"
+    },
+    {
+      "type": "analog-input",
+      "instance": 76,
+      "name": "026026060009:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 77,
+      "name": "026026060009:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 78,
+      "name": "026026060009:battery",
+      "value": "3.700000047683716"
+    },
+    {
+      "type": "analog-input",
+      "instance": 79,
+      "name": "026026060009:signal",
+      "value": "-84.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 80,
+      "name": "026026060009:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 81,
+      "name": "026026060009:alarm",
+      "value": "inactive"
+    },
+    {
+      "type": "analog-input",
+      "instance": 82,
+      "name": "057A26060001:totalizer",
+      "value": "81.33149719238281"
+    },
+    {
+      "type": "analog-input",
+      "instance": 83,
+      "name": "057A26060001:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 84,
+      "name": "057A26060001:reverse",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 85,
+      "name": "057A26060001:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 86,
+      "name": "057A26060001:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 87,
+      "name": "057A26060001:battery",
+      "value": "3.5999999046325684"
+    },
+    {
+      "type": "analog-input",
+      "instance": 88,
+      "name": "057A26060001:signal",
+      "value": "-112.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 89,
+      "name": "057A26060001:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 90,
+      "name": "057A26060001:alarm",
+      "value": "active"
+    },
+    {
+      "type": "analog-input",
+      "instance": 91,
+      "name": "057A26060002:totalizer",
+      "value": "44.028480529785156"
+    },
+    {
+      "type": "analog-input",
+      "instance": 92,
+      "name": "057A26060002:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 93,
+      "name": "057A26060002:reverse",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 94,
+      "name": "057A26060002:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 95,
+      "name": "057A26060002:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 96,
+      "name": "057A26060002:battery",
+      "value": "3.6500000953674316"
+    },
+    {
+      "type": "analog-input",
+      "instance": 97,
+      "name": "057A26060002:signal",
+      "value": "-91.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 98,
+      "name": "057A26060002:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 99,
+      "name": "057A26060002:alarm",
+      "value": "active"
+    },
+    {
+      "type": "analog-input",
+      "instance": 100,
+      "name": "057A26060003:totalizer",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 101,
+      "name": "057A26060003:pressure",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 102,
+      "name": "057A26060003:reverse",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 103,
+      "name": "057A26060003:pulse1",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 104,
+      "name": "057A26060003:pulse2",
+      "value": "0.0"
+    },
+    {
+      "type": "analog-input",
+      "instance": 105,
+      "name": "057A26060003:battery",
+      "value": "3.6500000953674316"
+    },
+    {
+      "type": "analog-input",
+      "instance": 106,
+      "name": "057A26060003:signal",
+      "value": "-95.0"
+    },
+    {
+      "type": "binary-input",
+      "instance": 107,
+      "name": "057A26060003:online",
+      "value": "active"
+    },
+    {
+      "type": "binary-input",
+      "instance": 108,
+      "name": "057A26060003:alarm",
+      "value": "active"
+    }
+  ]
+}

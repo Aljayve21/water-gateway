@@ -32,6 +32,8 @@ security:
 tags:
   - name: bms
     description: Read-only Neoview/BMS endpoints.
+  - name: ai
+    description: Read-only AI assistant endpoints. Recommendations only; nothing here writes to plant.
 
 paths:
   /bms/points:
@@ -227,6 +229,59 @@ paths:
                     description: How much of the map is authored vs station-derived.
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
+
+  /ai/analyze:
+    get:
+      tags: [ai]
+      summary: Turn open findings into ranked recommendations.
+      description: |
+        Analyzes the caller's current open findings (water-meter anomalies plus
+        BMS requirement violations) and returns ranked, explained recommendations
+        for the site engineer.
+
+        Strictly GET-only and side-effect free: nothing is written to the
+        database and no plant action is recommended. The model is consulted at
+        most once per unique set of facts - repeat calls with unchanged facts
+        return a cached answer and spend no tokens. An empty finding set returns
+        immediately without consulting the model at all.
+
+        Scope is enforced per caller: a USER only ever sees their own meters,
+        and requesting an out-of-scope meter returns 403 without a model call.
+      parameters:
+        - in: query
+          name: meter_id
+          schema: { type: string }
+          description: Optional meter to scope the analysis to. When omitted,
+            the whole site (admin/technician) or the caller's meters (user) are
+            analysed.
+      responses:
+        "200":
+          description: Ranked recommendations (possibly "nothing needs attention").
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recommendation:
+                    type: string
+                    description: Human-readable ranked recommendations.
+                  cached:
+                    type: boolean
+                    description: Whether the answer was reused from cache.
+                  aws_call:
+                    type: boolean
+                    description: Whether the model was consulted this request.
+                  findings_analyzed:
+                    type: integer
+                  findings_by_rule:
+                    type: object
+                  scope:
+                    type: object
+                required: [recommendation, cached, aws_call, findings_analyzed, scope]
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "405": { $ref: "#/components/responses/MethodNotAllowed" }
+        "503": { $ref: "#/components/responses/Unavailable" }
 
 components:
   securitySchemes:

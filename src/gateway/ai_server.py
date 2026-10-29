@@ -29,6 +29,8 @@ from typing import Any, Optional
 from urllib.parse import parse_qs, unquote, urlparse
 
 from .ai.agent import Assistant
+from .ai.analyze import Analyzer, meter_state
+from .ai.anomaly import readings_from_buffer
 from .ai.bedrock import BedrockClient, BedrockError, CircuitOpen
 from .ai.roles import Principal, PrincipalResolver, Role, StaticPrincipalResolver
 from .ai.tools import MeterTools
@@ -197,6 +199,11 @@ class AIServer:
         # a missing or empty file is valid and falls back to station names, so
         # this must never stop the server from starting.
         self.equipment_map = equipment_map if equipment_map is not None else EquipmentMap()
+        # Read-only analyzer. Unlike summary_writer it persists nothing; it only
+        # turns the current findings into recommendations, cached in memory by
+        # fact-fingerprint so repeat GETs cost no tokens. Optional: a site with
+        # no Bedrock client simply has no /ai/analyze.
+        self.analyzer = Analyzer(client, ttl_seconds=900) if client is not None else None
         self.limiter = _RateLimiter(rate_limit_per_min)
         self._server: Optional[asyncio.AbstractServer] = None
         self._started_monotonic: Optional[float] = None
@@ -403,6 +410,13 @@ class AIServer:
             await self._json(writer, 200, {"summary": self._scope_summary(latest, principal)})
             return
 
+        if path == "/ai/analyze":
+            if method not in ("GET", "HEAD"):
+                await self._json(writer, 405, {"error": "method not allowed"})
+                return
+            await self._handle_analyze(writer, principal, query)
+            return
+
         # ── BMS REST endpoints (read-only) ──────────────────────────────────
         if path == "/bms/points":
             if method not in ("GET", "HEAD"):
@@ -575,6 +589,92 @@ class AIServer:
                 await self._json(writer, 503, {"error": "ai_unavailable"})
                 return
         result.pop("facts", None)
+        await self._json(writer, 200, result)
+
+    async def _handle_analyze(self, writer, principal: Principal, query: str) -> None:
+        """Turn the caller's current findings into ranked recommendations.
+
+        GET-only and side-effect free: nothing is written, and the model is
+        consulted only when the underlying facts have actually changed. An
+        empty finding set returns immediately without spending an AWS call,
+        which is the common case on a healthy site.
+        """
+        if self.analyzer is None:
+            await self._json(
+                writer, 503, {"error": "ai_unavailable", "detail": "no bedrock client configured"}
+            )
+            return
+
+        meter_id = (_query_str(query, "meter_id") or "").strip()
+        if meter_id and not principal.can_access(meter_id):
+            # Fail closed: an out-of-scope meter must not be analysed, and the
+            # refusal must not confirm whether such a meter exists.
+            await self._json(
+                writer, 403, {"error": "access denied", "meter_id": meter_id}
+            )
+            return
+
+        # Scope the fact set. A consumer never sees another meter's state.
+        if meter_id:
+            visible_ids: Optional[list[str]] = [meter_id]
+        elif principal.sees_all_meters:
+            visible_ids = None
+        else:
+            visible_ids = list(principal.meters)
+
+        # Both finding sources feed one analysis, matching /bms/alarms.
+        findings: list[dict[str, Any]] = []
+        if self.summary_writer is not None:
+            findings.extend(principal.filter_findings(self.summary_writer.buffer.open_findings()))
+        findings.extend(self._obix_alarm_findings(principal))
+        if meter_id:
+            findings = [f for f in findings if f.get("meter_id") == meter_id]
+        findings.sort(key=lambda f: -SEVERITY_ORDER.get(str(f.get("severity")), -1))
+
+        if not findings:
+            # Nothing is wrong: say so plainly and spend nothing.
+            await self._json(
+                writer,
+                200,
+                {
+                    "recommendation": "No open findings. Nothing needs attention.",
+                    "cached": False,
+                    "findings_analyzed": 0,
+                    "findings_by_rule": {},
+                    "scope": {"meter_id": meter_id} if meter_id else {"scope": "site"},
+                    "aws_call": False,
+                },
+            )
+            return
+
+        facts: dict[str, Any] = Analyzer.trim(findings)
+        if self.tools is not None and getattr(self.tools, "buffer", None) is not None:
+            try:
+                readings = readings_from_buffer(self.tools.buffer, visible_ids)
+                facts["meters"] = meter_state(readings, visible_ids)
+            except Exception:  # noqa: BLE001 - meter state is supplementary only
+                pass
+
+        scope_key = f"{principal.subject}:{meter_id or '*'}"
+        try:
+            result = await self.analyzer.analyze(facts, scope_key=scope_key)
+        except CircuitOpen as exc:
+            await self._json(writer, 503, {"error": "ai_unavailable", "detail": str(exc)})
+            return
+        except BedrockError as exc:
+            await self._json(writer, 503, {"error": "ai_unavailable", "detail": str(exc)})
+            return
+        except Exception as exc:  # noqa: BLE001
+            log.warning("analyze failed: %s", type(exc).__name__)
+            await self._json(writer, 503, {"error": "ai_unavailable"})
+            return
+
+        result["scope"] = (
+            {"meter_id": meter_id}
+            if meter_id
+            else ({"scope": "site"} if principal.sees_all_meters else {"scope": "your meters", "meters": list(visible_ids or [])})
+        )
+        result["aws_call"] = not result.get("cached", False)
         await self._json(writer, 200, result)
 
     async def _handle_ask(self, writer, body: bytes, principal: Principal) -> None:

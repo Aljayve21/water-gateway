@@ -66,7 +66,7 @@ control → cloud**. Each step earns the trust the next one needs.
 | 4 | AI access | `list_bms_points`, `get_bms_history` in `/ai/ask` | ✅ done | verified live end-to-end |
 | 3b | Contract & docs | OpenAPI + AWS architecture doc | ✅ done | `docs/bms-openapi.yaml`, `docs/AWS_BMS_AGENT_ARCHITECTURE.md` |
 | **6** | **Validate vs Neoview config** | **Flag data that doesn't fit point config (units, ranges, stale, frozen, enum) — for **oBIX/BMS** points** | 🟡 core done | validator + script + tests ✅; in `/bms/alarms` + `list_bms_findings` ✅; facet probe ready ✅ (run on-site to confirm) |
-| 7 | Recommend | AI turns findings into ranked, explained recommendations | ⏳ planned | recommendation in answer + daily summary |
+| 7 | Recommend | AI turns findings into ranked, explained recommendations | ✅ done | `GET /ai/analyze?meter_id=` in answer, per-principal scoping, cached by fact-fingerprint, no writes; covered by `tests/test_ai_analyze.py` |
 | 8 | Control | AI proposes writes → approved → oBIX write | 🔒 gated | writable points + approval flow + audit |
 | 9 | AWS mirror | Bedrock Agent + API GW + Lambda (+KB) | 🔒 gated | permission + networking decision |
 
@@ -88,6 +88,15 @@ control → cloud**. Each step earns the trust the next one needs.
 > authored. `GET /bms/equipment` lists every point under both names and
 > `GET /bms/points/{equipment_id}/{equipment_point}` accepts an equipment
 > address. See [`src/gateway/equipment.py`](../src/gateway/equipment.py).
+
+> **Recommendation:** `GET /ai/analyze?meter_id=<optional>` turns the caller's
+> current open findings (water-meter anomalies + BMS requirement violations)
+> into ranked, explained recommendations the site engineer can read. It is
+> strictly GET-only: nothing is written, no plant action is recommended, and the
+> model is consulted only when the facts change — repeat calls with unchanged
+> findings return a cached answer and spend no tokens. Scope is per-caller; a
+> USER never sees another meter's findings, and an out-of-scope `meter_id`
+> returns 403 without an AWS call. Contract in [`docs/bms-openapi.yaml`](bms-openapi.yaml).
 
 ---
 
